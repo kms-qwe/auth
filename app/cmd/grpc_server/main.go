@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net"
 
@@ -12,7 +11,10 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-const grpcPort = 9001
+const (
+	address  = "localhost"
+	grpcPort = "9001"
+)
 
 type server struct {
 	desc.UnimplementedUserV1Server
@@ -35,7 +37,7 @@ func (s *server) Delete(_ context.Context, req *desc.DeleteRequest) (*emptypb.Em
 	return &emptypb.Empty{}, nil
 }
 func main() {
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", grpcPort))
+	lis, err := net.Listen("tcp", address+":"+grpcPort)
 	if err != nil {
 		log.Fatalf("falied to listen: %v", err)
 	}
