@@ -18,19 +18,19 @@ type server struct {
 	desc.UnimplementedUserV1Server
 }
 
-func (s *server) Create(ctx context.Context, req *desc.CreateRequest) (*desc.CreateResponse, error) {
+func (s *server) Create(_ context.Context, req *desc.CreateRequest) (*desc.CreateResponse, error) {
 	log.Printf("get create request: %#v:\n", req)
 	return &desc.CreateResponse{Id: 0}, nil
 }
-func (s *server) Get(ctx context.Context, req *desc.GetRequest) (*desc.GetResponse, error) {
+func (s *server) Get(_ context.Context, req *desc.GetRequest) (*desc.GetResponse, error) {
 	log.Printf("get gete request: %#v:", req)
 	return &desc.GetResponse{User: &desc.User{}}, nil
 }
-func (s *server) Update(ctx context.Context, req *desc.UpdateRequest) (*emptypb.Empty, error) {
+func (s *server) Update(_ context.Context, req *desc.UpdateRequest) (*emptypb.Empty, error) {
 	log.Printf("get update request: %#v\n", req)
 	return &emptypb.Empty{}, nil
 }
-func (s *server) Delete(ctx context.Context, req *desc.DeleteRequest) (*emptypb.Empty, error) {
+func (s *server) Delete(_ context.Context, req *desc.DeleteRequest) (*emptypb.Empty, error) {
 	log.Printf("get delete request: %#v\n", req)
 	return &emptypb.Empty{}, nil
 }
