@@ -5,7 +5,7 @@ import (
 	"log"
 	"net"
 
-	desc "github.com/kms-qwe/microservices_course_auth/app/pkg/user_v1"
+	desc "github.com/kms-qwe/microservices_course_auth/pkg/user_v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/types/known/emptypb"
