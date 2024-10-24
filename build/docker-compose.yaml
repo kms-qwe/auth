@@ -1,5 +1,7 @@
 version: '3'
 
+volumes:
+  postgres_volume:
 
 services:
   pg:
@@ -7,16 +9,18 @@ services:
     environment:
       - "POSTGRES_DB=${PG_DATABASE_NAME}"
       - "POSTGRES_USER=${PG_USER}"
-      - "POSTGERS_PASSWORD=${PG_PASSWORD}"
+      - "POSTGRES_PASSWORD=${PG_PASSWORD}"
+      - TZ=Europe/Moscow
     ports:
       - "${PG_PORT}:${CONTAINER_PG_PORT}"
     volumes:
-      - postgres_volumem:/var/lib/portgresql/data
+      - postgres_volume:/var/lib/portgresql/data
   
   migrator:
     build:
       context: .
       dockerfile: migration.Dockerfile 
-    restart: on-filure
+    restart: on-failure
     environment:
-      DB_HOST: pg
+      - TZ=Europe/Moscow
+      - DB_HOST=pg

@@ -16,4 +16,4 @@ COPY .env .
 
 RUN chmod +x migration.sh
 
-ENTRYPOINT [ "bash", "migration.sh"ы]
+ENTRYPOINT [ "bash", "migration.sh"]
