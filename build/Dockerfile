@@ -12,7 +12,7 @@ WORKDIR /root/
 COPY --from=builder /github.com/kms-qwe/microservices_course_auth/source/bin/crud_server .
 COPY config ./config/
 
-CMD ["./crud_server", "-config-path=./config/prod.env"]
+CMD ["./crud_server", "-config-path=./config/local.env"]
 
 
 

@@ -4,15 +4,27 @@ volumes:
   postgres_volume:
 
 services:
+  auth:
+    build:
+      context: ..
+      dockerfile: ./build/Dockerfile
+    depends_on:
+      - pg
+    ports:
+      - ${LOCAL_GPRC_OUTER_PORT}:${LOCAL_GPRC_INNER_PORT}
+    environment:
+      - TZ=Europe/Moscow
+      
+    
   pg:
     image: postgres:14-alpine3.17
     environment:
-      - "POSTGRES_DB=${PG_DATABASE_NAME}"
-      - "POSTGRES_USER=${PG_USER}"
-      - "POSTGRES_PASSWORD=${PG_PASSWORD}"
+      - "POSTGRES_DB=${LOCAL_PG_DATABASE_NAME}"
+      - "POSTGRES_USER=${LOCAL_PG_USER}"
+      - "POSTGRES_PASSWORD=${LOCAL_PG_PASSWORD}"
       - TZ=Europe/Moscow
     ports:
-      - "${PG_PORT}:${CONTAINER_PG_PORT}"
+      - "${LOCAL_PG_OUTER_PORT}:${LOCAL_PG_INNER_PORT}"
     volumes:
       - postgres_volume:/var/lib/portgresql/data
   
