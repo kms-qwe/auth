@@ -30,7 +30,7 @@ func (pg *pgStorage) AddNewUser(ctx context.Context, info *model.UserInfo) (int6
 	var userID int64
 	err = pg.pool.QueryRow(ctx, query, args...).Scan(&userID)
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 
 	log.Printf("inserted user with id: %d\n", userID)

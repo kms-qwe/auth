@@ -18,8 +18,8 @@ services:
   
   migrator:
     build:
-      context: .
-      dockerfile: migration.Dockerfile 
+      context: ..
+      dockerfile: ./build/migration.Dockerfile 
     restart: on-failure
     environment:
       - TZ=Europe/Moscow
