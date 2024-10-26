@@ -7,8 +7,8 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/kms-qwe/microservices_course_auth/internal/model"
-	"github.com/kms-qwe/microservices_course_auth/internal/storage"
+	"github.com/kms-qwe/auth/internal/model"
+	"github.com/kms-qwe/auth/internal/storage"
 )
 
 type pgStorage struct {

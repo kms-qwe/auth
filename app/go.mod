@@ -1,4 +1,4 @@
-module github.com/kms-qwe/microservices_course_auth
+module github.com/kms-qwe/auth
 
 go 1.22
 

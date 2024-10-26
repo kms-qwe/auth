@@ -3,6 +3,8 @@ package env
 import (
 	"errors"
 	"os"
+
+	"github.com/kms-qwe/auth/internal/config"
 )
 
 const (
@@ -18,7 +20,7 @@ func (p *pgConfig) DSN() string {
 }
 
 // NewPGConfig creates a new PostgreSQL configuration based on environment variables.
-func NewPGConfig() (*pgConfig, error) {
+func NewPGConfig() (config.PGConfig, error) {
 	dsn := os.Getenv(dsnEnvName)
 	if len(dsn) == 0 {
 		return nil, errors.New("pg dsn not found")

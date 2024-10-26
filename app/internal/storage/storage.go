@@ -3,7 +3,7 @@ package storage
 import (
 	"context"
 
-	"github.com/kms-qwe/microservices_course_auth/internal/model"
+	"github.com/kms-qwe/auth/internal/model"
 )
 
 // Storage interface defines methods for user data storage operations.

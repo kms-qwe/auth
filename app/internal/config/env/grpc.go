@@ -5,7 +5,7 @@ import (
 	"net"
 	"os"
 
-	"github.com/kms-qwe/microservices_course_auth/internal/config"
+	"github.com/kms-qwe/auth/internal/config"
 )
 
 const (
