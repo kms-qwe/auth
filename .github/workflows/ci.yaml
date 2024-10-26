@@ -119,7 +119,16 @@ jobs:
           envs: REGISTRY, AUTH_IMAGE_NAME, AUTH_CONTAINER_NAME, MIGRATOR_IMAGE_NAME, MIGRATOR_CONTAINER_NAME, PG_IMAGE_NAME, PG_CONTAINER_NAME
           script: |
             # set up variables
+            echo "GITHUB_REF: $GITHUB_REF"
+            echo "GITHUB_EVENT_NAME: $GITHUB_EVENT_NAME"
+            echo "GITHUB_HEAD_REF: $GITHUB_HEAD_REF"
             echo "GITHUB_SHA: $GITHUB_SHA"
+            if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
+              TAG_NAME=$(echo $GITHUB_HEAD_SHA | head -c7)  # Используем HEAD SHA
+            else
+              TAG_NAME=$(echo $GITHUB_SHA | head -c7)
+            fi
+
             TAG_NAME=$(echo $GITHUB_SHA | head -c7)
             # Убедитесь, что переменные определены
             if [ -z "$TAG_NAME" ]; then
