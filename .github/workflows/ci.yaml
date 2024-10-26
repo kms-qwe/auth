@@ -98,8 +98,13 @@ jobs:
       - name: build and push docker image - auth
         run: |
           TAG_NAME=$(echo $GITHUB_SHA | head -c7)
+          cat <<EOF > .env
+            GRPC_HOST=${{ secrets.GRPC_HOST }}
+            GRPC_PORT=${{ secrets.GRPC_PORT }}
+            PG_DSN="host=$PG_CONTAINER_NAME port=${{ secrets.PG_INNER_PORT }} dbname=${{ secrets.PG_DATABASE_NAME }} user=${{ secrets.PG_USER }} password=${{ secrets.PG_PASSWORD }} sslmode=disable"
+            EOF
           docker buildx create --use
-          docker buildx build --no-cache --push --tag $REGISTRY/$AUTH_IMAGE_NAME:$TAG_NAME -f build/Dockerfile .
+          docker buildx build --no-cache --push --tag $REGISTRY/$AUTH_IMAGE_NAME:$TAG_NAME --build-arg PATH_TO_CONFIG_FILE=.env -f build/Dockerfile .
 
       - name: build and push docker image - migrator
         run: |
@@ -133,11 +138,10 @@ jobs:
             GRPC_OUTER_PORT=${{ secrets.GPRC_OUTER_PORT }}
             GRPC_INNER_PORT=${{ secrets.GPRC_INNER_PORT }}
             MIGRATION_DIR=${{ secrets.MIGRATION_DIR }}
-            PG_HOST=$PG_IMAGE_NAME
+            PG_HOST=$PG_CONTAINER_NAME
             GRPC_HOST=${{ secrets.GRPC_HOST }}
             GRPC_PORT=${{ secrets.GRPC_PORT }}
-            PG_DSN="host=$PG_IMAGE_NAME port=${{ secrets.PG_INNER_PORT }} dbname=${{ secrets.PG_DATABASE_NAME }} user=${{ secrets.PG_USER }} password=${{ secrets.PG_PASSWORD }} sslmode=disable"
-            CONFIG_PATH=".env"
+            PG_DSN="host=$PG_CONTAINER_NAME port=${{ secrets.PG_INNER_PORT }} dbname=${{ secrets.PG_DATABASE_NAME }} user=${{ secrets.PG_USER }} password=${{ secrets.PG_PASSWORD }} sslmode=disable"
             EOF
             
             # login into selectel registry

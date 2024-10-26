@@ -10,9 +10,11 @@ FROM alpine:3.19
 
 WORKDIR /root/
 COPY --from=builder /github.com/kms-qwe/microservices_course_auth/source/bin/crud_server .
-COPY config ./config/
 
-CMD sh -c "./crud_server -config-path=${CONFIG_PATH}"
+ARG PATH_TO_CONFIG_FILE
+COPY ${PATH_TO_CONFIG_FILE} "./config/.env"
+
+CMD ["./crud_server", "-config-path=./config/.env"]
 
 
 

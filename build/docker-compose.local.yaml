@@ -8,25 +8,24 @@ services:
     build:
       context: ..
       dockerfile: ./build/Dockerfile
+      args:
+        PATH_TO_CONFIG_FILE: "./config/local.env"
     depends_on:
       - pg
     ports:
-      - ${LOCAL_GPRC_OUTER_PORT}:${LOCAL_GPRC_INNER_PORT}
+      - ${GPRC_OUTER_PORT}:${GPRC_INNER_PORT}
     environment:
       - TZ=Europe/Moscow
-      - CONFIG_PATH=./config/local.env
+
   
 
     
   pg:
     image: postgres:14-alpine3.17
-    environment:
-      - "POSTGRES_DB=${LOCAL_PG_DATABASE_NAME}"
-      - "POSTGRES_USER=${LOCAL_PG_USER}"
-      - "POSTGRES_PASSWORD=${LOCAL_PG_PASSWORD}"
-      - TZ=Europe/Moscow
+    env_file:
+      - ".env"
     ports:
-      - "${LOCAL_PG_OUTER_PORT}:${LOCAL_PG_INNER_PORT}"
+      - "${PG_OUTER_PORT}:${PG_INNER_PORT}"
     volumes:
       - postgres_volume:/var/lib/portgresql/data
   
@@ -37,9 +36,6 @@ services:
       args:
         MIGRATION_DIR: "./migration"
     restart: on-failure
-    environment:
-      - TZ=Europe/Moscow
-      - DB_HOST=pg
     env_file:
-      - "../config/local.env"
+      - ".env"
 
