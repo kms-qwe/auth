@@ -98,11 +98,10 @@ jobs:
       - name: build and push docker image - auth
         run: |
           TAG_NAME=$(echo $GITHUB_SHA | head -c7)
-          cat <<EOF > .env
-            GRPC_HOST=${{ secrets.GRPC_HOST }}
-            GRPC_PORT=${{ secrets.GRPC_PORT }}
-            PG_DSN="host=$PG_CONTAINER_NAME port=${{ secrets.PG_INNER_PORT }} dbname=${{ secrets.PG_DATABASE_NAME }} user=${{ secrets.PG_USER }} password=${{ secrets.PG_PASSWORD }} sslmode=disable"
-            EOF
+          touch .env
+          echo GRPC_HOST=${{ secrets.GRPC_HOST }} >> .env
+          echo GRPC_PORT=${{ secrets.GRPC_PORT }} >> .env
+          echo PG_DSN="host=$PG_CONTAINER_NAME port=${{ secrets.PG_INNER_PORT }} dbname=${{ secrets.PG_DATABASE_NAME }} user=${{ secrets.PG_USER }} password=${{ secrets.PG_PASSWORD }} sslmode=disable" >> .env
           docker buildx create --use
           docker buildx build --no-cache --push --tag $REGISTRY/$AUTH_IMAGE_NAME:$TAG_NAME --build-arg PATH_TO_CONFIG_FILE=.env -f build/Dockerfile .
 
@@ -161,8 +160,9 @@ jobs:
             # Проверка существующих контейнеров
             echo "Current Docker containers:"
             docker ps -a
-
+            # check all env
+            cat .env
             # sun a new containers from a new images
-            docker run -d --env-file .env --name $AUTH_CONTAINER_NAME -p ${{ secrets.GPRC_OUTER_PORT }}:${{ secrets.GPRC_INNER_PORT }} -t $REGISTRY/$AUTH_IMAGE_NAME:$TAG_NAME
+            docker run -d --name $AUTH_CONTAINER_NAME -p ${{ secrets.GPRC_OUTER_PORT }}:${{ secrets.GPRC_INNER_PORT }} -t $REGISTRY/$AUTH_IMAGE_NAME:$TAG_NAME
             docker run -d --env-file .env --name $MIGRATOR_CONTAINER_NAME -t $REGISTRY/$MIGRATOR_IMAGE_NAME:$TAG_NAME
             docker run -d --env-file .env --name $PG_CONTAINER_NAME -p ${{ secrets.PG_OUTER_PORT }}:${{ secrets.PG_INNER_PORT }} -t $PG_IMAGE_NAME
