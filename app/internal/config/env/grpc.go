@@ -22,6 +22,7 @@ func (g *grpcConfig) Address() string {
 	return net.JoinHostPort(g.host, g.port)
 }
 
+// NewGRPCConfig creates a new gRPC configuration based on environment variables.
 func NewGRPCConfig() (config.GRPCConfig, error) {
 	host := os.Getenv(grpcHostEnvName)
 	if len(host) == 0 {

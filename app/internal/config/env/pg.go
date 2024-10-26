@@ -16,6 +16,8 @@ type pgConfig struct {
 func (p *pgConfig) DSN() string {
 	return p.dsn
 }
+
+// NewPGConfig creates a new PostgreSQL configuration based on environment variables.
 func NewPGConfig() (*pgConfig, error) {
 	dsn := os.Getenv(dsnEnvName)
 	if len(dsn) == 0 {

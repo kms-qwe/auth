@@ -6,6 +6,7 @@ import (
 	"github.com/kms-qwe/microservices_course_auth/internal/model"
 )
 
+// Storage interface defines methods for user data storage operations.
 type Storage interface {
 	AddNewUser(ctx context.Context, info *model.UserInfo) (int64, error)
 	GetUser(ctx context.Context, id int64) (*model.User, error)

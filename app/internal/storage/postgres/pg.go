@@ -60,7 +60,7 @@ func (pg *pgStorage) GetUser(ctx context.Context, id int64) (*model.User, error)
 	log.Printf("id: %d, name: %s, email: %s, password: %s, role: %d, created_at: %s, updated_at: %s\n", id, name, email, password, role, createdAt, updatedAt)
 
 	return &model.User{
-		Id: id,
+		ID: id,
 		Info: &model.UserInfo{
 			Name:     name,
 			Email:    email,
@@ -110,6 +110,8 @@ func (pg *pgStorage) DeleteUser(ctx context.Context, id int64) error {
 
 	return nil
 }
+
+// NewPgStorage initializes a new PostgreSQL storage instance using the provided DSN.
 func NewPgStorage(ctx context.Context, DSN string) (storage.Storage, error) {
 	pool, err := pgxpool.New(ctx, DSN)
 	if err != nil {

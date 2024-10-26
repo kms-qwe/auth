@@ -29,6 +29,7 @@ type server struct {
 	storage storage.Storage
 }
 
+// NewSever initializes a new server instance with the provided DSN for storage.
 func NewSever(ctx context.Context, DSN string) (*server, error) {
 	storage, err := postgres.NewPgStorage(ctx, DSN)
 	if err != nil {
@@ -61,7 +62,7 @@ func (s *server) Get(ctx context.Context, req *desc.GetRequest) (*desc.GetRespon
 	}
 
 	return &desc.GetResponse{User: &desc.User{
-		Id:        user.Id,
+		Id:        user.ID,
 		CreatedAt: timestamppb.New(user.CreatedAt),
 		UpdatedAt: timestamppb.New(user.UpdatedAt),
 		Info: &desc.UserInfo{
