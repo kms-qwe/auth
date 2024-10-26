@@ -119,6 +119,7 @@ jobs:
           envs: REGISTRY, AUTH_IMAGE_NAME, AUTH_CONTAINER_NAME, MIGRATOR_IMAGE_NAME, MIGRATOR_CONTAINER_NAME, PG_IMAGE_NAME, PG_CONTAINER_NAME
           script: |
             # set up variables
+            echo "GITHUB_SHA: $GITHUB_SHA"
             TAG_NAME=$(echo $GITHUB_SHA | head -c7)
             # Убедитесь, что переменные определены
             if [ -z "$TAG_NAME" ]; then
