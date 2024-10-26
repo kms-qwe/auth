@@ -9,7 +9,7 @@ on:
 env:
   REGISTRY: "cr.selcloud.ru/kms-qwe"
   AUTH_IMAGE_NAME: "auth-server"
-  AUTH_CONTAINER_NAME: "auth-sever-container"
+  AUTH_CONTAINER_NAME: "auth-server-container"
   MIGRATOR_IMAGE_NAME: "migrator"
   MIGRATOR_CONTAINER_NAME: "migrator-container"
   PG_IMAGE_NAME: "pg"
@@ -110,33 +110,34 @@ jobs:
     needs: images-build-and-push
 
     steps:
-      - name: create .env file
-        run: | 
-          echo "PG_DATABASE_NAME=${{ secrets.PG_DATABASE_NAME }}" >> .env
-          echo "PG_USER=${{ secrets.PG_USER }}" >> .env
-          echo "PG_PASSWORD=${{ secrets.PG_PASSWORD }}" >> .env
-          echo "PG_OUTER_PORT=${{ secrets.PG_OUTER_PORT }}" >> .env
-          echo "PG_INNER_PORT=${{ secrets.PG_INNER_PORT }}" >> .env
-          echo "GPRC_OUTER_PORT=${{ secrets.GPRC_OUTER_PORT }}" >> .env
-          echo "GPRC_INNER_PORT=${{ secrets.GPRC_INNER_PORT }}" >> .env
-          echo "MIGRATION_DIR=${{ secrets.MIGRATION_DIR }}" >> .env
-          echo "GRPC_HOST=${{ secrets.GRPC_HOST }}" >> .env
-          echo "GRPC_PORT=${{ secrets.GRPC_PORT }}" >> .env
-          echo "PG_DSN=\"host=$PG_IMAGE_NAME port=${{ secrets.PG_INNER_PORT }} dbname=${{ secrets.PG_DATABASE_NAME }} user=${{ secrets.PG_USER }} password=${{ secrets.PG_PASSWORD }} sslmode=disable\"" >> .env
-
       - name: deploy to selectel cloud via SSH action
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSHKEY }}
-          envs:  AUTH_IMAGE_NAME, AUTH_CONTAINER_NAME, MIGRATOR_IMAGE_NAME, MIGRATOR_CONTAINER_NAME
+          envs: REGISTRY, AUTH_IMAGE_NAME, AUTH_CONTAINER_NAME, MIGRATOR_IMAGE_NAME, MIGRATOR_CONTAINER_NAME, PG_CONTAINER_NAME
           script: |
             # set up variables
             TAG_NAME=$(echo $GITHUB_SHA | head -c7)
 
+            # Create the .env file on the server
+            cat <<EOF > .env
+            PG_DATABASE_NAME=${{ secrets.PG_DATABASE_NAME }}
+            PG_USER=${{ secrets.PG_USER }}
+            PG_PASSWORD=${{ secrets.PG_PASSWORD }}
+            PG_OUTER_PORT=${{ secrets.PG_OUTER_PORT }}
+            PG_INNER_PORT=${{ secrets.PG_INNER_PORT }}
+            GRPC_OUTER_PORT=${{ secrets.GPRC_OUTER_PORT }}
+            GRPC_INNER_PORT=${{ secrets.GPRC_INNER_PORT }}
+            MIGRATION_DIR=${{ secrets.MIGRATION_DIR }}
+            GRPC_HOST=${{ secrets.GRPC_HOST }}
+            GRPC_PORT=${{ secrets.GRPC_PORT }}
+            PG_DSN="host=$PG_IMAGE_NAME port=${{ secrets.PG_INNER_PORT }} dbname=${{ secrets.PG_DATABASE_NAME }} user=${{ secrets.PG_USER }} password=${{ secrets.PG_PASSWORD }} sslmode=disable"
+            EOF
+            
             # login into selectel registry
-            echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login -u ${{ secrets.REGISTRY_USERNAME }} ${{ secrets.REGISTRY }} --password-stdin
+            echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login -u ${{ secrets.REGISTRY_USERNAME }} $REGISTRY --password-stdin
               
             # stop running containers
             docker stop $MIGRATOR_CONTAINER_NAME $AUTH_CONTAINER_NAME $PG_CONTAINER_NAME 
