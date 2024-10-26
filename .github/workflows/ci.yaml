@@ -17,10 +17,9 @@ env:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
         - uses: actions/checkout@v4
-
         - name: set up Go
           uses: actions/setup-go@v5
           with:
@@ -39,7 +38,7 @@ jobs:
 
   linter:
     name: lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -80,72 +79,72 @@ jobs:
           # install-mode: "goinstall"
 
 
-  image-build-and-push:
-    runs-on: ubunt-22.04
+  # images-build-and-push:
+  #   runs-on: ubuntu-22.04
   
-    steps:
-      - name: checkout master
-        uses: actions/checkout@v3
+  #   steps:
+  #     - name: checkout master
+  #       uses: actions/checkout@v3
       
-      - name: set up docker buildx
-        uses: docker/setup-buildx-action@v2
+  #     - name: set up docker buildx
+  #       uses: docker/setup-buildx-action@v2
 
-      - name: login to docker registry
-        uses: docker login -u ${{ secrets.REGISTRY_USERNAME}} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
+  #     - name: login to docker registry
+  #       uses: docker login -u ${{ secrets.REGISTRY_USERNAME}} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
       
-      - name: build and push docker image - auth
-        run: |
-          TAG_NAME=$(echo $GITHUB_SHA | head -c7)
-          docker buildx create --use
-          docker buildx build --no-cache --push --tag $REGISTRY/$AUTH_IMAGE_NAME:$TAG_NAME -f build/Dockerfile .
+  #     - name: build and push docker image - auth
+  #       run: |
+  #         TAG_NAME=$(echo $GITHUB_SHA | head -c7)
+  #         docker buildx create --use
+  #         docker buildx build --no-cache --push --tag $REGISTRY/$AUTH_IMAGE_NAME:$TAG_NAME -f build/Dockerfile .
 
-      - name: build and push docker image - migrator
-        run: |
-          TAG_NAME=$(echo $GITHUB_SHA | head -c7)
-          docker buildx create --use
-          docker buildx build --no-cache --push --tag $REGISTRY/$MIGRATOR_IMAGE_NAME:$TAG_NAME  --build-arg MIGRATION_DIR=./migration  -f build/migrator.Dockerfile .
+  #     - name: build and push docker image - migrator
+  #       run: |
+  #         TAG_NAME=$(echo $GITHUB_SHA | head -c7)
+  #         docker buildx create --use
+  #         docker buildx build --no-cache --push --tag $REGISTRY/$MIGRATOR_IMAGE_NAME:$TAG_NAME  --build-arg MIGRATION_DIR=./migration  -f build/migrator.Dockerfile .
       
-  deploy-image:
-    runs-on: ubuntu-22.04
-    needs: image-build-and-push
+  # deploy-images:
+  #   runs-on: ubuntu-22.04
+  #   needs: image-build-and-push
 
-    steps:
-      - name: create .env file
-        run: | 
-          echo "PG_DATABASE_NAME=${{ secrets.PG_DATABASE_NAME }}" >> .env
-          echo "PG_USER=${{ secrets.PG_USER }}" >> .env
-          echo "PG_PASSWORD=${{ secrets.PG_PASSWORD }}" >> .env
-          echo "PG_OUTER_PORT=${{ secrets.PG_OUTER_PORT }}" >> .env
-          echo "PG_INNER_PORT=${{ secrets.PG_INNER_PORT }}" >> .env
-          echo "GPRC_OUTER_PORT=${{ secrets.GPRC_OUTER_PORT }}" >> .env
-          echo "GPRC_INNER_PORT=${{ secrets.GPRC_INNER_PORT }}" >> .env
-          echo "MIGRATION_DIR=${{ secrets.MIGRATION_DIR }}" >> .env
-          echo "GRPC_HOST=${{ secrets.GRPC_HOST }}" >> .env
-          echo "GRPC_PORT=${{ secrets.GRPC_PORT }}" >> .env
-          echo "PG_DSN=\"host=${{ PG_IMAGE_NAME }} port=${{ secrets.PG_INNER_PORT }} dbname=${{ secrets.PG_DATABASE_NAME }} user=${{ secrets.PG_USER }} password=${{ secrets.PG_PASSWORD }} sslmode=disable\"" >> .env
+  #   steps:
+  #     - name: create .env file
+  #       run: | 
+  #         echo "PG_DATABASE_NAME=${{ secrets.PG_DATABASE_NAME }}" >> .env
+  #         echo "PG_USER=${{ secrets.PG_USER }}" >> .env
+  #         echo "PG_PASSWORD=${{ secrets.PG_PASSWORD }}" >> .env
+  #         echo "PG_OUTER_PORT=${{ secrets.PG_OUTER_PORT }}" >> .env
+  #         echo "PG_INNER_PORT=${{ secrets.PG_INNER_PORT }}" >> .env
+  #         echo "GPRC_OUTER_PORT=${{ secrets.GPRC_OUTER_PORT }}" >> .env
+  #         echo "GPRC_INNER_PORT=${{ secrets.GPRC_INNER_PORT }}" >> .env
+  #         echo "MIGRATION_DIR=${{ secrets.MIGRATION_DIR }}" >> .env
+  #         echo "GRPC_HOST=${{ secrets.GRPC_HOST }}" >> .env
+  #         echo "GRPC_PORT=${{ secrets.GRPC_PORT }}" >> .env
+  #         echo "PG_DSN=\"host=${{ PG_IMAGE_NAME }} port=${{ secrets.PG_INNER_PORT }} dbname=${{ secrets.PG_DATABASE_NAME }} user=${{ secrets.PG_USER }} password=${{ secrets.PG_PASSWORD }} sslmode=disable\"" >> .env
 
 
-      - name: deploy to selectel cloud via SSH action
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SSH_USERNAME}}
-          key: ${{ secrets.SSHKEY }}
-          envs:  AUTH_IMAGE_NAME, AUTH_CONTAINER_NAME, MIGRATOR_IMAGE_NAME, MIGRATOR_CONTAINER_NAME
-          script: |
-            # set up variables
-            TAG_NAME=$(echo $GITHUB_SHA | head -c7)
+  #     - name: deploy to selectel cloud via SSH action
+  #       uses: appleboy/ssh-action@v1.0.0
+  #       with:
+  #         host: ${{ secrets.SERVER_HOST }}
+  #         username: ${{ secrets.SSH_USERNAME}}
+  #         key: ${{ secrets.SSHKEY }}
+  #         envs:  AUTH_IMAGE_NAME, AUTH_CONTAINER_NAME, MIGRATOR_IMAGE_NAME, MIGRATOR_CONTAINER_NAME
+  #         script: |
+  #           # set up variables
+  #           TAG_NAME=$(echo $GITHUB_SHA | head -c7)
 
-            # login into selectel registry
-            docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
+  #           # login into selectel registry
+  #           docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
               
-            # stop running containers
-            docker stop $MIGRATOR_CONTAINER_NAME $AUTH_CONTAINER_NAME $PG_CONTAINER_NAME 
+  #           # stop running containers
+  #           docker stop $MIGRATOR_CONTAINER_NAME $AUTH_CONTAINER_NAME $PG_CONTAINER_NAME 
               
-            # semove old containers
-            docker rm $MIGRATOR_CONTAINER_NAME $AUTH_CONTAINER_NAME $PG_CONTAINER_NAME 
+  #           # remove old containers
+  #           docker rm $MIGRATOR_CONTAINER_NAME $AUTH_CONTAINER_NAME $PG_CONTAINER_NAME 
               
-            # sun a new containers from a new images
-            docker run -d --env-file .env --name $AUTH_CONTAINER_NAME -p ${{ secrets.GPRC_OUTER_PORT }}:${{ secrets.GPRC_INNER_PORT }} -t $REGISTRY/$AUTH_IMAGE_NAME:$TAG_NAME
-            docker run -d --env-file .env --name $MIGRATOR_CONTAINER_NAME -t $REGISTRY/$MIGRATOR_IMAGE_NAME:$TAG_NAME
-            docker run -d --env-file .env --name $PG_CONTAINER_NAME -p ${{ secrets.PG_OUTER_PORT }}:${{ secrets.PG_INNER_PORT }} -t $REGISTRY/$PG_IMAGE_NAME
+  #           # sun a new containers from a new images
+  #           docker run -d --env-file .env --name $AUTH_CONTAINER_NAME -p ${{ secrets.GPRC_OUTER_PORT }}:${{ secrets.GPRC_INNER_PORT }} -t $REGISTRY/$AUTH_IMAGE_NAME:$TAG_NAME
+  #           docker run -d --env-file .env --name $MIGRATOR_CONTAINER_NAME -t $REGISTRY/$MIGRATOR_IMAGE_NAME:$TAG_NAME
+  #           docker run -d --env-file .env --name $PG_CONTAINER_NAME -p ${{ secrets.PG_OUTER_PORT }}:${{ secrets.PG_INNER_PORT }} -t $REGISTRY/$PG_IMAGE_NAME
