@@ -18,7 +18,7 @@ env:
 jobs:
   build-and-test:
     runs-on: ubuntu-22.04
-    if: false
+    if: true
     steps:
         - uses: actions/checkout@v4
         - name: set up Go
@@ -40,7 +40,7 @@ jobs:
   linter:
     name: lint
     runs-on: ubuntu-22.04
-    if: false
+    if: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -121,23 +121,13 @@ jobs:
           envs: REGISTRY, AUTH_IMAGE_NAME, AUTH_CONTAINER_NAME, MIGRATOR_IMAGE_NAME, MIGRATOR_CONTAINER_NAME, PG_IMAGE_NAME, PG_CONTAINER_NAME, GITHUB_SHA
           script: |
             # set up variables
-            echo "GITHUB_SHA: $GITHUB_SHA"
             TAG_NAME=$(echo $GITHUB_SHA | head -c7)
-            # Убедитесь, что переменные определены
-            if [ -z "$TAG_NAME" ]; then
-              echo "TAG_NAME is not set. Exiting."
-              exit 1
-            fi
 
-            if [ -z "$PG_IMAGE_NAME" ]; then
-              echo "PG_IMAGE_NAME is not set. Exiting."
-              exit 1
-            fi
             # Create the .env file on the server
             cat <<EOF > .env
-            PG_DATABASE_NAME=${{ secrets.PG_DATABASE_NAME }}
-            PG_USER=${{ secrets.PG_USER }}
-            PG_PASSWORD=${{ secrets.PG_PASSWORD }}
+            POSTGRES_DB=${{ secrets.PG_DATABASE_NAME }}
+            POSTGRES_USER=${{ secrets.PG_USER }}
+            POSTGRES_PASSWORD=${{ secrets.PG_PASSWORD }}
             PG_OUTER_PORT=${{ secrets.PG_OUTER_PORT }}
             PG_INNER_PORT=${{ secrets.PG_INNER_PORT }}
             GRPC_OUTER_PORT=${{ secrets.GPRC_OUTER_PORT }}
@@ -146,6 +136,7 @@ jobs:
             GRPC_HOST=${{ secrets.GRPC_HOST }}
             GRPC_PORT=${{ secrets.GRPC_PORT }}
             PG_DSN="host=$PG_IMAGE_NAME port=${{ secrets.PG_INNER_PORT }} dbname=${{ secrets.PG_DATABASE_NAME }} user=${{ secrets.PG_USER }} password=${{ secrets.PG_PASSWORD }} sslmode=disable"
+            CONFIG_PATH=".env"
             EOF
             
             # login into selectel registry
@@ -159,12 +150,6 @@ jobs:
                 fi
             done 
 
-            echo "Starting containers with the following parameters:"
-            echo "AUTH_IMAGE_NAME: $AUTH_IMAGE_NAME"
-            echo "MIGRATOR_IMAGE_NAME: $MIGRATOR_IMAGE_NAME"
-            echo "PG_IMAGE_NAME: $PG_IMAGE_NAME"
-            echo "REGISTRY: $REGISTRY"
-            echo "TAG_NAME: $TAG_NAME"
 
             # sun a new containers from a new images
             docker run -d --env-file .env --name $AUTH_CONTAINER_NAME -p ${{ secrets.GPRC_OUTER_PORT }}:${{ secrets.GPRC_INNER_PORT }} -t $REGISTRY/$AUTH_IMAGE_NAME:$TAG_NAME
