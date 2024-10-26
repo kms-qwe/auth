@@ -116,11 +116,20 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSHKEY }}
-          envs: REGISTRY, AUTH_IMAGE_NAME, AUTH_CONTAINER_NAME, MIGRATOR_IMAGE_NAME, MIGRATOR_CONTAINER_NAME, PG_CONTAINER_NAME
+          envs: REGISTRY, AUTH_IMAGE_NAME, AUTH_CONTAINER_NAME, MIGRATOR_IMAGE_NAME, MIGRATOR_CONTAINER_NAME, PG_IMAGE_NAME, PG_CONTAINER_NAME
           script: |
             # set up variables
             TAG_NAME=$(echo $GITHUB_SHA | head -c7)
+            # Убедитесь, что переменные определены
+            if [ -z "$TAG_NAME" ]; then
+              echo "TAG_NAME is not set. Exiting."
+              exit 1
+            fi
 
+            if [ -z "$PG_IMAGE_NAME" ]; then
+              echo "PG_IMAGE_NAME is not set. Exiting."
+              exit 1
+            fi
             # Create the .env file on the server
             cat <<EOF > .env
             PG_DATABASE_NAME=${{ secrets.PG_DATABASE_NAME }}
