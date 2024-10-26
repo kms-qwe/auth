@@ -103,7 +103,7 @@ jobs:
         run: |
           TAG_NAME=$(echo $GITHUB_SHA | head -c7)
           docker buildx create --use
-          docker buildx build --no-cache --push --tag $REGISTRY/$MIGRATOR_IMAGE_NAME:$TAG_NAME  --build-arg MIGRATION_DIR=./migration  -f build/migrator.Dockerfile .
+          docker buildx build --no-cache --push --tag $REGISTRY/$MIGRATOR_IMAGE_NAME:$TAG_NAME  --build-arg MIGRATION_DIR=./migration  -f build/migration.Dockerfile .
       
   deploy-images:
     runs-on: ubuntu-22.04
