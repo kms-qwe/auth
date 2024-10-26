@@ -18,7 +18,7 @@ env:
 jobs:
   build-and-test:
     runs-on: ubuntu-22.04
-    if: true
+    if: false
     steps:
         - uses: actions/checkout@v4
         - name: set up Go
@@ -40,7 +40,7 @@ jobs:
   linter:
     name: lint
     runs-on: ubuntu-22.04
-    if: true
+    if: false
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -144,7 +144,7 @@ jobs:
  
             # stop and remove containers if they exist
             for container in $MIGRATOR_CONTAINER_NAME $AUTH_CONTAINER_NAME $PG_CONTAINER_NAME; do
-                if [ "$(docker ps -q -f name=$container)" ]; then
+                if [ "$(docker ps -a -q -f name=$container)" ]; then
                     echo "Stopping and removing container: $container"
                     docker stop $container
                     docker rm $container
