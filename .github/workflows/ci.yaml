@@ -29,13 +29,13 @@ jobs:
 
         - name: build
           run: |
-          cd ./app 
-          go build -o ../bin/ -v ./...
+            cd ./app 
+            go build -o ../bin/ -v ./...
 
         - name: test
           run: |
-          cd app
-          test -v ./...
+            cd app
+            test -v ./...
 
   linter:
     name: lint
