@@ -166,6 +166,7 @@ jobs:
 
 
             docker run -d \
+            --restart on-failure:10 \
             --env-file .env \
             --network my_network \
             --name $MIGRATOR_CONTAINER_NAME \
