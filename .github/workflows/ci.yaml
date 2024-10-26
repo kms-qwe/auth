@@ -18,7 +18,7 @@ env:
 jobs:
   build-and-test:
     runs-on: ubuntu-22.04
-    if: false
+    if: true
     steps:
         - uses: actions/checkout@v4
         - name: set up Go
@@ -40,7 +40,7 @@ jobs:
   linter:
     name: lint
     runs-on: ubuntu-22.04
-    if: false
+    if: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -135,8 +135,8 @@ jobs:
             POSTGRES_DB=${{ secrets.PG_DATABASE_NAME }}
             POSTGRES_USER=${{ secrets.PG_USER }}
             POSTGRES_PASSWORD=${{ secrets.PG_PASSWORD }}
-            PG_OUTER_PORT=${{ secrets.PG_INNER_PORT }}
-            PG_INNER_PORT=${{secrets.PG_OUTER_PORT }}
+            PG_OUTER_PORT=${{ secrets.PG_OUTER_PORT }}
+            PG_INNER_PORT=${{secrets.PG_INNER_PORT }}
             MIGRATION_DIR=${{ secrets.MIGRATION_DIR }}
             DB_HOST=$PG_CONTAINER_NAME
             TZ=Europe/Moscow
@@ -158,11 +158,12 @@ jobs:
 
             # start a new containers from a new images
             docker run -d \
-            --name $AUTH_CONTAINER_NAME \
+            --env-file .env \
+            --name $PG_CONTAINER_NAME \
             --network my_network \
-            -e TZ=Europe/Moscow \
-            -p ${{ secrets.GPRC_OUTER_PORT }}:${{ secrets.GPRC_INNER_PORT }} \
-            -t $REGISTRY/$AUTH_IMAGE_NAME:$TAG_NAME
+            -p ${{ secrets.PG_OUTER_PORT }}:${{ secrets.PG_INNER_PORT }} \
+            -t $PG_IMAGE_NAME
+
 
             docker run -d \
             --env-file .env \
@@ -171,10 +172,13 @@ jobs:
             -t $REGISTRY/$MIGRATOR_IMAGE_NAME:$TAG_NAME
 
             docker run -d \
-            --env-file .env \
-            --name $PG_CONTAINER_NAME \
+            --name $AUTH_CONTAINER_NAME \
             --network my_network \
-            -p ${{ secrets.PG_OUTER_PORT }}:${{ secrets.PG_INNER_PORT }} \
-            -t $PG_IMAGE_NAME
+            -e TZ=Europe/Moscow \
+            -p ${{ secrets.GPRC_OUTER_PORT }}:${{ secrets.GPRC_INNER_PORT }} \
+            -t $REGISTRY/$AUTH_IMAGE_NAME:$TAG_NAME
+
+
+            
 
    
