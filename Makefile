@@ -43,13 +43,9 @@ local-migration-up:
 local-migration-down:
 	${LOCAL_BIN}/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${PG_MIGRATION_DSN} down -v
 
-docker-build-and-push:
-	docker buildx build --no-cache --platform linux/amd64 -t cr.selcloud.ru/kms-qwe/test-server:v0.0.1 -f build/Dockerfile .
-	docker login -u token -p CRgAAAAAtKOC23XtNMwhnpTGPYSnUEDFyrRyYhx2 cr.selcloud.ru/kms-qwe
-	docker push cr.selcloud.ru/kms-qwe/test-server:v0.0.1
 
 docker-compose-local-up:
-	docker-compose -f ./build/docker-compose.local.yaml up --build -d 
+	docker compose -f ./build/docker-compose.local.yaml up --build -d 
 
 docker-compose-local-down:
-	docker-compose -f ./build/docker-compose.local.yaml down 
+	docker compose -f ./build/docker-compose.local.yaml down 

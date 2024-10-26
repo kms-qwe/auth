@@ -8,10 +8,11 @@ RUN apk update && \
 ADD https://github.com/pressly/goose/releases/download/v3.14.0/goose_linux_x86_64 /bin/goose
 RUN chmod +x /bin/goose
 
-WORKDIR /root
+WORKDIR /root/
 
 ARG MIGRATION_DIR
-COPY ./migration/*.sql migration/
+
+COPY ${MIGRATION_DIR} migration/
 COPY ./build/migration.sh .
 
 RUN chmod +x migration.sh
