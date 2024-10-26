@@ -133,6 +133,7 @@ jobs:
             GRPC_OUTER_PORT=${{ secrets.GPRC_OUTER_PORT }}
             GRPC_INNER_PORT=${{ secrets.GPRC_INNER_PORT }}
             MIGRATION_DIR=${{ secrets.MIGRATION_DIR }}
+            PG_HOST=$PG_IMAGE_NAME
             GRPC_HOST=${{ secrets.GRPC_HOST }}
             GRPC_PORT=${{ secrets.GRPC_PORT }}
             PG_DSN="host=$PG_IMAGE_NAME port=${{ secrets.PG_INNER_PORT }} dbname=${{ secrets.PG_DATABASE_NAME }} user=${{ secrets.PG_USER }} password=${{ secrets.PG_PASSWORD }} sslmode=disable"
