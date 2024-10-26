@@ -141,15 +141,21 @@ jobs:
             
             # login into selectel registry
             echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login -u ${{ secrets.REGISTRY_USERNAME }} $REGISTRY --password-stdin
-
+ 
             # stop and remove containers if they exist
             for container in $MIGRATOR_CONTAINER_NAME $AUTH_CONTAINER_NAME $PG_CONTAINER_NAME; do
                 if [ "$(docker ps -q -f name=$container)" ]; then
+                    echo "Stopping and removing container: $container"
                     docker stop $container
                     docker rm $container
+                else
+                    echo "Container $container is not running."
                 fi
             done 
 
+            # Проверка существующих контейнеров
+            echo "Current Docker containers:"
+            docker ps -a
 
             # sun a new containers from a new images
             docker run -d --env-file .env --name $AUTH_CONTAINER_NAME -p ${{ secrets.GPRC_OUTER_PORT }}:${{ secrets.GPRC_INNER_PORT }} -t $REGISTRY/$AUTH_IMAGE_NAME:$TAG_NAME
