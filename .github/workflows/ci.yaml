@@ -135,6 +135,8 @@ jobs:
             POSTGRES_DB=${{ secrets.PG_DATABASE_NAME }}
             POSTGRES_USER=${{ secrets.PG_USER }}
             POSTGRES_PASSWORD=${{ secrets.PG_PASSWORD }}
+            PG_OUTER_PORT=${{ secrets.PG_INNER_PORT }}
+            PG_INNER_PORT=${{secrets.PG_OUTER_PORT }}
             MIGRATION_DIR=${{ secrets.MIGRATION_DIR }}
             DB_HOST=$PG_CONTAINER_NAME
             TZ=Europe/Moscow
