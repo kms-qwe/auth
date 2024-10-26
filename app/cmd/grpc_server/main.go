@@ -61,10 +61,17 @@ func (s *server) Get(ctx context.Context, req *desc.GetRequest) (*desc.GetRespon
 		return nil, err
 	}
 
+	var updatedAtProto *timestamppb.Timestamp
+
+	if user.UpdatedAt != nil {
+		updatedAtProto = timestamppb.New(*user.UpdatedAt)
+	} else {
+		updatedAtProto = nil
+	}
 	return &desc.GetResponse{User: &desc.User{
 		Id:        user.ID,
 		CreatedAt: timestamppb.New(user.CreatedAt),
-		UpdatedAt: timestamppb.New(user.UpdatedAt),
+		UpdatedAt: updatedAtProto,
 		Info: &desc.UserInfo{
 			Name:     user.Info.Name,
 			Email:    user.Info.Email,

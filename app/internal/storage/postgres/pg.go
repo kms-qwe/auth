@@ -50,14 +50,14 @@ func (pg *pgStorage) GetUser(ctx context.Context, id int64) (*model.User, error)
 	var name, email, password string
 	var role int32
 	var createdAt time.Time
-	var updatedAt time.Time
+	var updatedAt *time.Time
 
 	err = pg.pool.QueryRow(ctx, query, args...).Scan(&name, &email, &password, &role, &createdAt, &updatedAt)
 	if err != nil {
 		return nil, err
 	}
 
-	log.Printf("id: %d, name: %s, email: %s, password: %s, role: %d, created_at: %s, updated_at: %s\n", id, name, email, password, role, createdAt, updatedAt)
+	log.Printf("id: %d, name: %s, email: %s, password: %s, role: %d, created_at: %s, updated_at: %v\n", id, name, email, password, role, createdAt, updatedAt)
 
 	return &model.User{
 		ID: id,
