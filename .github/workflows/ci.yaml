@@ -103,7 +103,10 @@ jobs:
           echo GRPC_PORT=${{ secrets.GRPC_PORT }} >> .env
           echo PG_DSN="host=$PG_CONTAINER_NAME port=${{ secrets.PG_INNER_PORT }} dbname=${{ secrets.PG_DATABASE_NAME }} user=${{ secrets.PG_USER }} password=${{ secrets.PG_PASSWORD }} sslmode=disable" >> .env
           docker buildx create --use
-          docker buildx build --no-cache --push --tag $REGISTRY/$AUTH_IMAGE_NAME:$TAG_NAME --build-arg PATH_TO_CONFIG_FILE=.env -f build/Dockerfile .
+          docker buildx build --no-cache --push \
+          --tag $REGISTRY/$AUTH_IMAGE_NAME:$TAG_NAME \
+          --build-arg PATH_TO_CONFIG_FILE=.env \
+          -f build/Dockerfile .
 
       - name: build and push docker image - migrator
         run: |
@@ -132,15 +135,9 @@ jobs:
             POSTGRES_DB=${{ secrets.PG_DATABASE_NAME }}
             POSTGRES_USER=${{ secrets.PG_USER }}
             POSTGRES_PASSWORD=${{ secrets.PG_PASSWORD }}
-            PG_OUTER_PORT=${{ secrets.PG_OUTER_PORT }}
-            PG_INNER_PORT=${{ secrets.PG_INNER_PORT }}
-            GRPC_OUTER_PORT=${{ secrets.GPRC_OUTER_PORT }}
-            GRPC_INNER_PORT=${{ secrets.GPRC_INNER_PORT }}
             MIGRATION_DIR=${{ secrets.MIGRATION_DIR }}
-            PG_HOST=$PG_CONTAINER_NAME
-            GRPC_HOST=${{ secrets.GRPC_HOST }}
-            GRPC_PORT=${{ secrets.GRPC_PORT }}
-            PG_DSN="host=$PG_CONTAINER_NAME port=${{ secrets.PG_INNER_PORT }} dbname=${{ secrets.PG_DATABASE_NAME }} user=${{ secrets.PG_USER }} password=${{ secrets.PG_PASSWORD }} sslmode=disable"
+            DB_HOST=$PG_CONTAINER_NAME
+            TZ=Europe/Moscow
             EOF
             
             # login into selectel registry
@@ -149,20 +146,26 @@ jobs:
             # stop and remove containers if they exist
             for container in $MIGRATOR_CONTAINER_NAME $AUTH_CONTAINER_NAME $PG_CONTAINER_NAME; do
                 if [ "$(docker ps -a -q -f name=$container)" ]; then
-                    echo "Stopping and removing container: $container"
                     docker stop $container
                     docker rm $container
-                else
-                    echo "Container $container is not running."
-                fi
             done 
 
-            # Проверка существующих контейнеров
-            echo "Current Docker containers:"
-            docker ps -a
-            # check all env
-            cat .env
-            # sun a new containers from a new images
-            docker run -d --name $AUTH_CONTAINER_NAME -p ${{ secrets.GPRC_OUTER_PORT }}:${{ secrets.GPRC_INNER_PORT }} -t $REGISTRY/$AUTH_IMAGE_NAME:$TAG_NAME
-            docker run -d --env-file .env --name $MIGRATOR_CONTAINER_NAME -t $REGISTRY/$MIGRATOR_IMAGE_NAME:$TAG_NAME
-            docker run -d --env-file .env --name $PG_CONTAINER_NAME -p ${{ secrets.PG_OUTER_PORT }}:${{ secrets.PG_INNER_PORT }} -t $PG_IMAGE_NAME
+            # start a new containers from a new images
+            docker run -d \
+            --name $AUTH_CONTAINER_NAME \
+            -e TZ=Europe/Moscow \
+            -p ${{ secrets.GPRC_OUTER_PORT }}:${{ secrets.GPRC_INNER_PORT }} \
+            -t $REGISTRY/$AUTH_IMAGE_NAME:$TAG_NAME
+
+            docker run -d \
+            --env-file .env \
+            --name $MIGRATOR_CONTAINER_NAME \
+            -t $REGISTRY/$MIGRATOR_IMAGE_NAME:$TAG_NAME
+
+            docker run -d \
+            --env-file .env \
+            --name $PG_CONTAINER_NAME \
+            -p ${{ secrets.PG_OUTER_PORT }}:${{ secrets.PG_INNER_PORT }} \
+            -t $PG_IMAGE_NAME
+
+   
