@@ -16,7 +16,7 @@ type pgStorage struct {
 }
 
 func (pg *pgStorage) AddNewUser(ctx context.Context, info *model.UserInfo) (int64, error) {
-	builderInsert := sq.Insert("userV1.user").
+	builderInsert := sq.Insert("users").
 		PlaceholderFormat(sq.Dollar).
 		Columns("name", "email", "password", "role").
 		Values(info.Name, info.Email, info.Password, info.Role).
@@ -39,7 +39,7 @@ func (pg *pgStorage) AddNewUser(ctx context.Context, info *model.UserInfo) (int6
 }
 func (pg *pgStorage) GetUser(ctx context.Context, id int64) (*model.User, error) {
 	builderSelectOne := sq.Select("name", "email", "password", "role", "created_at", "updated_at").
-		From("userV1.user").
+		From("users").
 		PlaceholderFormat(sq.Dollar).
 		Where(sq.Eq{"id": id})
 
@@ -72,7 +72,7 @@ func (pg *pgStorage) GetUser(ctx context.Context, id int64) (*model.User, error)
 	}, nil
 }
 func (pg *pgStorage) UpdateUserInfo(ctx context.Context, id int64, name, email string, role int32) error {
-	builderUpdate := sq.Update("userV1.user").
+	builderUpdate := sq.Update("users").
 		PlaceholderFormat(sq.Dollar).
 		Set("name", name).
 		Set("email", email).
@@ -94,7 +94,7 @@ func (pg *pgStorage) UpdateUserInfo(ctx context.Context, id int64, name, email s
 	return nil
 }
 func (pg *pgStorage) DeleteUser(ctx context.Context, id int64) error {
-	builderUpdate := sq.Delete("userV1.user").
+	builderUpdate := sq.Delete("users").
 		Where(sq.Eq{"id": id}).
 		PlaceholderFormat(sq.Dollar)
 
