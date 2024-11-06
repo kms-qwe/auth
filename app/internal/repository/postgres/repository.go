@@ -7,7 +7,6 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	pgClient "github.com/kms-qwe/auth/internal/client/postgres"
-	pgv1 "github.com/kms-qwe/auth/internal/client/postgres/pg_v1"
 	"github.com/kms-qwe/auth/internal/model"
 	"github.com/kms-qwe/auth/internal/repository"
 	"github.com/kms-qwe/auth/internal/repository/postgres/user/converter"
@@ -139,12 +138,9 @@ func (r *repo) Delete(ctx context.Context, id int64) error {
 }
 
 // NewPgStorage initializes a new PostgreSQL storage instance using the provided DSN.
-func NewPgStorage(ctx context.Context, DSN string) (repository.UserRepository, error) {
-	db, err := pgv1.NewPgClient(ctx, DSN)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create pg client: %w", err)
-	}
+func NewPgRepository(pgClient pgClient.Client) repository.UserRepository {
+
 	return &repo{
-		db: db,
-	}, nil
+		db: pgClient,
+	}
 }

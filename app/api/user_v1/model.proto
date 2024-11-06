@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package user_V1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "github.com/kms-qwe/auth/app/pkg/user_V1;user_v1";
+
+enum Role {
+    USER = 0;
+    ADMIN = 1;
+}
+
+message UserInfo {
+    string name = 1;
+    string email = 2;
+    string password = 3;
+    string password_confirm = 4;
+    Role role = 5;
+}
+
+message User {
+    int64 id = 1;
+    UserInfo info = 2;
+    google.protobuf.Timestamp created_at = 3;
+    google.protobuf.Timestamp updated_at = 4;
+}
+
+message UserInfoUpdate {
+    int64 id = 1;
+    google.protobuf.StringValue name = 2;
+    google.protobuf.StringValue email = 3;
+    Role role = 4;
+}

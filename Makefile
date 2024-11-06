@@ -32,7 +32,7 @@ generate-note-api:
 	--plugin=protoc-gen-go=bin/protoc-gen-go \
 	--go-grpc_out=app/pkg/user_v1 --go-grpc_opt=paths=source_relative \
 	--plugin=protoc-gen-go-grpc=bin/protoc-gen-go-grpc \
-	app/api/user_v1/user.proto
+	app/api/user_v1/user.proto app/api/user_v1/model.proto
 
 local-migration-status:
 	${LOCAL_BIN}/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${PG_MIGRATION_DSN} status -v
