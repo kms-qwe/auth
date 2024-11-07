@@ -27,7 +27,7 @@ func (s *serv) Create(ctx context.Context, info *model.UserInfo) (int64, error) 
 	})
 
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 
 	return id, nil
