@@ -79,6 +79,7 @@ func (r *repo) Get(ctx context.Context, id int64) (*model.User, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user: %w", err)
 	}
+
 	return converter.ToUserFromRepo(repoUser), nil
 }
 
@@ -138,7 +139,7 @@ func (r *repo) Delete(ctx context.Context, id int64) error {
 }
 
 // NewPgStorage initializes a new PostgreSQL storage instance using the provided DSN.
-func NewPgRepository(pgClient pgClient.Client) repository.UserRepository {
+func NewUserRepository(pgClient pgClient.Client) repository.UserRepository {
 
 	return &repo{
 		db: pgClient,

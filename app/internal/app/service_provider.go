@@ -12,7 +12,8 @@ import (
 	"github.com/kms-qwe/auth/internal/config"
 	"github.com/kms-qwe/auth/internal/config/env"
 	"github.com/kms-qwe/auth/internal/repository"
-	usepg "github.com/kms-qwe/auth/internal/repository/postgres"
+	logpg "github.com/kms-qwe/auth/internal/repository/postgres/log"
+	usepg "github.com/kms-qwe/auth/internal/repository/postgres/user"
 	"github.com/kms-qwe/auth/internal/service"
 	useserv "github.com/kms-qwe/auth/internal/service/user"
 )
@@ -24,6 +25,7 @@ type serviceProvider struct {
 	pgClient       postgres.Client
 	txManager      postgres.TxManager
 	userRepository repository.UserRepository
+	logRepository  repository.LogRepository
 
 	userService service.UserService
 
@@ -90,15 +92,23 @@ func (s *serviceProvider) TxManager(ctx context.Context) postgres.TxManager {
 
 func (s *serviceProvider) UserRepository(ctx context.Context) repository.UserRepository {
 	if s.userRepository == nil {
-		s.userRepository = usepg.NewPgRepository(s.PGClient(ctx))
+		s.userRepository = usepg.NewUserRepository(s.PGClient(ctx))
 	}
 
 	return s.userRepository
 }
 
+func (s *serviceProvider) LogRepository(ctx context.Context) repository.LogRepository {
+	if s.logRepository == nil {
+		s.logRepository = logpg.NewLogRepository(s.PGClient(ctx))
+	}
+
+	return s.logRepository
+}
+
 func (s *serviceProvider) UserService(ctx context.Context) service.UserService {
 	if s.userService == nil {
-		s.userService = useserv.NewUserService(s.UserRepository(ctx), s.TxManager(ctx))
+		s.userService = useserv.NewUserService(s.UserRepository(ctx), s.LogRepository(ctx), s.TxManager(ctx))
 	}
 
 	return s.userService

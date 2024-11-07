@@ -75,5 +75,5 @@ func (m *manager) transaction(ctx context.Context, opts pgx.TxOptions, f pgClien
 		err = fmt.Errorf("failed executing code inside transaction")
 	}
 
-	return nil
+	return err
 }

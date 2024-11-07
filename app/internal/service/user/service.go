@@ -8,15 +8,18 @@ import (
 
 type serv struct {
 	userRepository repository.UserRepository
+	logRepository  repository.LogRepository
 	txManager      pgClient.TxManager
 }
 
 func NewUserService(
 	userRepository repository.UserRepository,
+	logRepository repository.LogRepository,
 	txManager pgClient.TxManager,
 ) service.UserService {
 	return &serv{
 		userRepository: userRepository,
+		logRepository:  logRepository,
 		txManager:      txManager,
 	}
 }
