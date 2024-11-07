@@ -72,7 +72,7 @@ func (m *manager) transaction(ctx context.Context, opts pgx.TxOptions, f pgClien
 	// Если функция терпит неудачу, возвращаем ошибку, и функция отсрочки выполняет откат
 	// или в противном случае транзакция коммитится.
 	if err = f(ctx); err != nil {
-		err = fmt.Errorf("failed executing code inside transaction")
+		err = fmt.Errorf("failed executing code inside transaction: %w", err)
 	}
 
 	return err
