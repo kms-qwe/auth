@@ -9,6 +9,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
+// Update handles the request for updating user data.
 func (i *Implementation) Update(ctx context.Context, req *desc.UpdateRequest) (*emptypb.Empty, error) {
 	err := i.userService.Update(ctx, converter.ToUserInfoUpdateFromDesc(req.UserUpdate))
 	if err != nil {

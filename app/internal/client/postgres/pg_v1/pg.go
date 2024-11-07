@@ -16,9 +16,11 @@ import (
 type key string
 
 const (
+	// TxKey key for transaction in context
 	TxKey key = "tx"
 )
 
+// MakeContextTx make context with TxKey
 func MakeContextTx(ctx context.Context, tx pgx.Tx) context.Context {
 	return context.WithValue(ctx, TxKey, tx)
 }
@@ -27,12 +29,14 @@ type pg struct {
 	dbc *pgxpool.Pool
 }
 
+// NewDB creates new pgClietn.DB
 func NewDB(dbc *pgxpool.Pool) pgClient.DB {
 	return &pg{
 		dbc: dbc,
 	}
 }
 
+// ScanOneContext scan one row result of QueryContext with pgxscan
 func (p *pg) ScanOneContext(ctx context.Context, dest interface{}, q pgClient.Query, args ...interface{}) error {
 	logQuery(ctx, q, args...)
 
@@ -44,6 +48,7 @@ func (p *pg) ScanOneContext(ctx context.Context, dest interface{}, q pgClient.Qu
 	return pgxscan.ScanOne(dest, row)
 }
 
+// ScanAllContext scan result of QueryContext with pgxscan
 func (p *pg) ScanAllContext(ctx context.Context, dest interface{}, q pgClient.Query, args ...interface{}) error {
 	logQuery(ctx, q, args...)
 
@@ -55,6 +60,7 @@ func (p *pg) ScanAllContext(ctx context.Context, dest interface{}, q pgClient.Qu
 	return pgxscan.ScanAll(dest, rows)
 }
 
+// ExecContext wrapper of pgpool Exec
 func (p *pg) ExecContext(ctx context.Context, q pgClient.Query, args ...interface{}) (pgconn.CommandTag, error) {
 	logQuery(ctx, q, args...)
 
@@ -66,6 +72,7 @@ func (p *pg) ExecContext(ctx context.Context, q pgClient.Query, args ...interfac
 	return p.dbc.Exec(ctx, q.QueryRaw, args...)
 }
 
+// ExecContext wrapper of pgpool Query
 func (p *pg) QueryContext(ctx context.Context, q pgClient.Query, args ...interface{}) (pgx.Rows, error) {
 	logQuery(ctx, q, args...)
 
@@ -77,6 +84,7 @@ func (p *pg) QueryContext(ctx context.Context, q pgClient.Query, args ...interfa
 	return p.dbc.Query(ctx, q.QueryRaw, args...)
 }
 
+// QueryRowContext wrapper of pgpool QueryRow
 func (p *pg) QueryRowContext(ctx context.Context, q pgClient.Query, args ...interface{}) pgx.Row {
 	logQuery(ctx, q, args...)
 
@@ -88,14 +96,17 @@ func (p *pg) QueryRowContext(ctx context.Context, q pgClient.Query, args ...inte
 	return p.dbc.QueryRow(ctx, q.QueryRaw, args...)
 }
 
+// Ping pings db
 func (p *pg) Ping(ctx context.Context) error {
 	return p.dbc.Ping(ctx)
 }
 
+// Close db connection
 func (p *pg) Close() {
 	p.dbc.Close()
 }
 
+// BeginTx begins transactions
 func (p *pg) BeginTx(ctx context.Context, txOptions pgx.TxOptions) (pgx.Tx, error) {
 	return p.dbc.BeginTx(ctx, txOptions)
 }

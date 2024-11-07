@@ -22,6 +22,7 @@ type UserInfo struct {
 	Role     int32
 }
 
+// UserInfoUpdate holds information about a user update.
 type UserInfoUpdate struct {
 	ID    int64
 	Name  sql.NullString

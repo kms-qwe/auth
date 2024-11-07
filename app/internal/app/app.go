@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
+// App is DI container
 type App struct {
 	serviceProvider *serviceProvider
 	grpcServer      *grpc.Server
@@ -25,6 +26,7 @@ func init() {
 	flag.StringVar(&configPath, "config-path", ".env", "path to config file")
 }
 
+// NewApp create new App
 func NewApp(ctx context.Context) (*App, error) {
 	a := &App{}
 
@@ -36,7 +38,8 @@ func NewApp(ctx context.Context) (*App, error) {
 	return a, nil
 }
 
-func (a *App) Run(ctx context.Context) error {
+// Run runs App
+func (a *App) Run(_ context.Context) error {
 	defer func() {
 		closer.CloseAll()
 		closer.Wait()
@@ -70,7 +73,7 @@ func (a *App) initConfig(_ context.Context) error {
 	return nil
 }
 
-func (a *App) initServiceProvider(ctx context.Context) error {
+func (a *App) initServiceProvider(_ context.Context) error {
 	a.serviceProvider = newServiceProvider()
 	return nil
 }

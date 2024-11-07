@@ -6,11 +6,13 @@ import (
 	"strings"
 )
 
+// Placeholderts for args in sql query
 const (
 	PlaceholderDollar   = "$"
 	PlaceholderQuestion = "?"
 )
 
+// Pretty make sql query pretty
 func Pretty(query string, placeholder string, args ...any) string {
 	for i, param := range args {
 		var value string

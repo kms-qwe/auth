@@ -21,12 +21,14 @@ type repo struct {
 	db pgClient.Client
 }
 
+// NewLogRepository create log interface
 func NewLogRepository(db pgClient.Client) repository.LogRepository {
 	return &repo{
 		db: db,
 	}
 }
 
+// Log saves log in db
 func (r *repo) Log(ctx context.Context, log string) error {
 	builder := sq.Insert(tableName).
 		PlaceholderFormat(sq.Dollar).

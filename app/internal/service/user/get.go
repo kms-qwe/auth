@@ -7,6 +7,7 @@ import (
 	"github.com/kms-qwe/auth/internal/model"
 )
 
+// Get gets a new user using the provided id
 func (s *serv) Get(ctx context.Context, id int64) (*model.User, error) {
 	var user = &model.User{}
 	err := s.txManager.ReadCommitted(ctx, func(ctx context.Context) error {

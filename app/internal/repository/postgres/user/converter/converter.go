@@ -5,6 +5,7 @@ import (
 	modelRepo "github.com/kms-qwe/auth/internal/repository/postgres/user/model"
 )
 
+// ToUserFromRepo convert serivce model to repo model
 func ToUserFromRepo(user *modelRepo.User) *model.User {
 	return &model.User{
 		ID:        user.ID,
@@ -14,6 +15,7 @@ func ToUserFromRepo(user *modelRepo.User) *model.User {
 	}
 }
 
+// ToRepoFromUser convert serivce model to repo model
 func ToRepoFromUser(user *model.User) *modelRepo.User {
 	return &modelRepo.User{
 		ID:        user.ID,
@@ -23,6 +25,7 @@ func ToRepoFromUser(user *model.User) *modelRepo.User {
 	}
 }
 
+// ToUserInfoFromRepo convert serivce model to repo model
 func ToUserInfoFromRepo(userInfo *modelRepo.UserInfo) *model.UserInfo {
 	return &model.UserInfo{
 		Name:     userInfo.Name,
@@ -32,6 +35,7 @@ func ToUserInfoFromRepo(userInfo *modelRepo.UserInfo) *model.UserInfo {
 	}
 }
 
+// ToRepoFromUserInfo convert serivce model to repo model
 func ToRepoFromUserInfo(userInfo *model.UserInfo) *modelRepo.UserInfo {
 	return &modelRepo.UserInfo{
 		Name:     userInfo.Name,
@@ -41,6 +45,7 @@ func ToRepoFromUserInfo(userInfo *model.UserInfo) *modelRepo.UserInfo {
 	}
 }
 
+// ToUserInfoUpdateFromRepo convert serivce model to repo model
 func ToUserInfoUpdateFromRepo(userInfoUpdate *modelRepo.UserInfoUpdate) *model.UserInfoUpdate {
 	return &model.UserInfoUpdate{
 		ID:    userInfoUpdate.ID,
@@ -50,6 +55,7 @@ func ToUserInfoUpdateFromRepo(userInfoUpdate *modelRepo.UserInfoUpdate) *model.U
 	}
 }
 
+// ToRepoFromUserInfoUpdate convert serivce model to repo model
 func ToRepoFromUserInfoUpdate(userInfoUpdate *model.UserInfoUpdate) *modelRepo.UserInfoUpdate {
 	return &modelRepo.UserInfoUpdate{
 		ID:    userInfoUpdate.ID,

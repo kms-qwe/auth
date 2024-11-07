@@ -9,18 +9,22 @@ import (
 
 var globalCloser = New()
 
+// Add func to global close list
 func Add(f ...func() error) {
 	globalCloser.Add(f...)
 }
 
+// Wait close all funcs of global closer
 func Wait() {
 	globalCloser.Wait()
 }
 
+// CloseAll funcs of global closer
 func CloseAll() {
 	globalCloser.CloseAll()
 }
 
+// Closer struct to manage shutdown
 type Closer struct {
 	mu    sync.Mutex
 	once  sync.Once
@@ -28,6 +32,7 @@ type Closer struct {
 	funcs []func() error
 }
 
+// New create Closer
 func New(sig ...os.Signal) *Closer {
 	c := &Closer{done: make(chan struct{})}
 
@@ -44,16 +49,19 @@ func New(sig ...os.Signal) *Closer {
 	return c
 }
 
+// Add func to close list
 func (c *Closer) Add(f ...func() error) {
 	c.mu.Lock()
 	c.funcs = append(c.funcs, f...)
 	c.mu.Unlock()
 }
 
+// Wait close all funcs of closer
 func (c *Closer) Wait() {
 	<-c.done
 }
 
+// CloseAll funcs of global closer
 func (c *Closer) CloseAll() {
 	c.once.Do(func() {
 		defer close(c.done)

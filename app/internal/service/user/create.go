@@ -7,6 +7,7 @@ import (
 	"github.com/kms-qwe/auth/internal/model"
 )
 
+// Create creates a new user using the provided user model
 func (s *serv) Create(ctx context.Context, info *model.UserInfo) (int64, error) {
 
 	var id int64

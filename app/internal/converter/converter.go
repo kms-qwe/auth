@@ -9,6 +9,7 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
+// ToUserFromDesc convert desc model to service model
 func ToUserFromDesc(user *desc.User) *model.User {
 	return &model.User{
 		ID:        user.Id,
@@ -18,6 +19,7 @@ func ToUserFromDesc(user *desc.User) *model.User {
 	}
 }
 
+// ToDescFromUser convert service model to desc model
 func ToDescFromUser(user *model.User) *desc.User {
 
 	return &desc.User{
@@ -28,6 +30,7 @@ func ToDescFromUser(user *model.User) *desc.User {
 	}
 }
 
+// ToUserInfoFromDesc convert desc model to service model
 func ToUserInfoFromDesc(userInfo *desc.UserInfo) *model.UserInfo {
 	return &model.UserInfo{
 		Name:     userInfo.Name,
@@ -37,6 +40,7 @@ func ToUserInfoFromDesc(userInfo *desc.UserInfo) *model.UserInfo {
 	}
 }
 
+// ToDescFromUserInfo convert service model to desc model
 func ToDescFromUserInfo(userInfo *model.UserInfo) *desc.UserInfo {
 	return &desc.UserInfo{
 		Name:     userInfo.Name,
@@ -46,6 +50,7 @@ func ToDescFromUserInfo(userInfo *model.UserInfo) *desc.UserInfo {
 	}
 }
 
+// ToUserInfoUpdateFromDesc convert desc model to service model
 func ToUserInfoUpdateFromDesc(userInfoUpdate *desc.UserInfoUpdate) *model.UserInfoUpdate {
 	return &model.UserInfoUpdate{
 		ID:    userInfoUpdate.Id,
@@ -55,6 +60,7 @@ func ToUserInfoUpdateFromDesc(userInfoUpdate *desc.UserInfoUpdate) *model.UserIn
 	}
 }
 
+// ToDescFromUserInfoUpdate convert service model to desc model
 func ToDescFromUserInfoUpdate(userInfoUpdate *model.UserInfoUpdate) *desc.UserInfoUpdate {
 	return &desc.UserInfoUpdate{
 		Id:    userInfoUpdate.ID,
@@ -64,6 +70,7 @@ func ToDescFromUserInfoUpdate(userInfoUpdate *model.UserInfoUpdate) *desc.UserIn
 	}
 }
 
+// TimestampToNullTime convert *timestamppb.Timestamp to sql.Nulltime
 func TimestampToNullTime(ts *timestamppb.Timestamp) sql.NullTime {
 	if ts == nil {
 		return sql.NullTime{Valid: false}
@@ -71,6 +78,7 @@ func TimestampToNullTime(ts *timestamppb.Timestamp) sql.NullTime {
 	return sql.NullTime{Time: ts.AsTime(), Valid: true}
 }
 
+// ConvertNullTimeToTimestamp convert sql.Nulltime to *timestamppb.Timestamp
 func ConvertNullTimeToTimestamp(nt sql.NullTime) *timestamppb.Timestamp {
 	var ts *timestamppb.Timestamp
 	if nt.Valid {
@@ -79,6 +87,7 @@ func ConvertNullTimeToTimestamp(nt sql.NullTime) *timestamppb.Timestamp {
 	return ts
 }
 
+// StringValueToNullString convert *wrapperspb.StringValue to sql.NullString
 func StringValueToNullString(sv *wrapperspb.StringValue) sql.NullString {
 	if sv == nil {
 		return sql.NullString{Valid: false}
@@ -86,6 +95,7 @@ func StringValueToNullString(sv *wrapperspb.StringValue) sql.NullString {
 	return sql.NullString{String: sv.String(), Valid: true}
 }
 
+// NullStringToStringValue convert sql.NullString to *wrapperspb.StringValue
 func NullStringToStringValue(ns sql.NullString) *wrapperspb.StringValue {
 	var sv *wrapperspb.StringValue
 	if ns.Valid {

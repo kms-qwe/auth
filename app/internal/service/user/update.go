@@ -7,6 +7,7 @@ import (
 	"github.com/kms-qwe/auth/internal/model"
 )
 
+// Update updates a new user using the provided update info
 func (s *serv) Update(ctx context.Context, info *model.UserInfoUpdate) error {
 	err := s.txManager.ReadCommitted(ctx, func(ctx context.Context) error {
 		var errTx error

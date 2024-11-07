@@ -21,6 +21,7 @@ type UserInfo struct {
 	Role     int32  `db:"role"`
 }
 
+// UserInfoUpdate holds information about a user.
 type UserInfoUpdate struct {
 	ID    int64          `db:"id"`
 	Name  sql.NullString `db:"name"`

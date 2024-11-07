@@ -8,6 +8,7 @@ import (
 	desc "github.com/kms-qwe/auth/pkg/user_v1"
 )
 
+// Create handles the request for creating a new user.
 func (i *Implementation) Create(ctx context.Context, req *desc.CreateRequest) (*desc.CreateResponse, error) {
 	id, err := i.userService.Create(ctx, converter.ToUserInfoFromDesc(req.Info))
 	if err != nil {

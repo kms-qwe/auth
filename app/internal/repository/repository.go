@@ -14,6 +14,7 @@ type UserRepository interface {
 	Delete(ctx context.Context, id int64) error
 }
 
+// LogRepository interface defines methods for log storage operations.
 type LogRepository interface {
 	Log(ctx context.Context, operation string) error
 }

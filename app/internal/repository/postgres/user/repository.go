@@ -29,6 +29,7 @@ type repo struct {
 	db pgClient.Client
 }
 
+// Create adds user to db
 func (r *repo) Create(ctx context.Context, info *model.UserInfo) (int64, error) {
 	repoInfo := converter.ToRepoFromUserInfo(info)
 
@@ -57,6 +58,7 @@ func (r *repo) Create(ctx context.Context, info *model.UserInfo) (int64, error) 
 	return id, nil
 }
 
+// Get select user from db
 func (r *repo) Get(ctx context.Context, id int64) (*model.User, error) {
 	builder := sq.Select(idColumn, nameColumn, emailColumn, passwordColumn, roleColumn, createdAtColumn, updatedAtColumn).
 		From(tableName).
@@ -83,6 +85,7 @@ func (r *repo) Get(ctx context.Context, id int64) (*model.User, error) {
 	return converter.ToUserFromRepo(repoUser), nil
 }
 
+// Update updates user info in db
 func (r *repo) Update(ctx context.Context, userInfoUpdate *model.UserInfoUpdate) error {
 	repoUserInfoUpdate := converter.ToRepoFromUserInfoUpdate(userInfoUpdate)
 
@@ -114,6 +117,7 @@ func (r *repo) Update(ctx context.Context, userInfoUpdate *model.UserInfoUpdate)
 	return nil
 }
 
+// Delete deletes user from db
 func (r *repo) Delete(ctx context.Context, id int64) error {
 	builder := sq.Delete(tableName).
 		PlaceholderFormat(sq.Dollar).
@@ -138,7 +142,7 @@ func (r *repo) Delete(ctx context.Context, id int64) error {
 	return nil
 }
 
-// NewPgStorage initializes a new PostgreSQL storage instance using the provided DSN.
+// NewUserRepository initializes a new PostgreSQL storage instance using the provided DSN.
 func NewUserRepository(pgClient pgClient.Client) repository.UserRepository {
 
 	return &repo{
