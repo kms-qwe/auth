@@ -17,6 +17,10 @@ func Wait() {
 	globalCloser.Wait()
 }
 
+func CloseAll() {
+	globalCloser.CloseAll()
+}
+
 type Closer struct {
 	mu    sync.Mutex
 	once  sync.Once

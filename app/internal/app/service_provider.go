@@ -30,6 +30,9 @@ type serviceProvider struct {
 	userImpl *user.Implementation
 }
 
+func newServiceProvider() *serviceProvider {
+	return &serviceProvider{}
+}
 func (s *serviceProvider) PGConfig() config.PGConfig {
 	if s.pgConfig == nil {
 		cfg, err := env.NewPGConfig()
