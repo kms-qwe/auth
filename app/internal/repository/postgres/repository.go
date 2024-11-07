@@ -58,7 +58,7 @@ func (r *repo) Create(ctx context.Context, info *model.UserInfo) (int64, error) 
 }
 
 func (r *repo) Get(ctx context.Context, id int64) (*model.User, error) {
-	builder := sq.Select(nameColumn, emailColumn, passwordColumn, roleColumn, createdAtColumn, updatedAtColumn).
+	builder := sq.Select(idColumn, nameColumn, emailColumn, passwordColumn, roleColumn, createdAtColumn, updatedAtColumn).
 		From(tableName).
 		PlaceholderFormat(sq.Dollar).
 		Where(sq.Eq{"id": id})
@@ -79,7 +79,6 @@ func (r *repo) Get(ctx context.Context, id int64) (*model.User, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user: %w", err)
 	}
-
 	return converter.ToUserFromRepo(repoUser), nil
 }
 
@@ -91,6 +90,7 @@ func (r *repo) Update(ctx context.Context, userInfoUpdate *model.UserInfoUpdate)
 		Set(nameColumn, repoUserInfoUpdate.Name).
 		Set(emailColumn, repoUserInfoUpdate.Email).
 		Set(roleColumn, repoUserInfoUpdate.Role).
+		Set(updatedAtColumn, sq.Expr("NOW()")).
 		Where(sq.Eq{"id": repoUserInfoUpdate.ID})
 
 	query, args, err := builder.ToSql()
