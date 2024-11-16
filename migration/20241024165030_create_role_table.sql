@@ -6,7 +6,8 @@ create table role (
 
 INSERT INTO role (id, role_name)
 VALUES
-    (0, 'user'),
-    (1, 'admin');
+    (0, 'unknown'),
+    (1, 'user'),
+    (2, 'admin');
 -- +goose Down
 drop table role;
