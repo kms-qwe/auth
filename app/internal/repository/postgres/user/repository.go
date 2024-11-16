@@ -5,24 +5,11 @@ import (
 	"fmt"
 	"log"
 
-	sq "github.com/Masterminds/squirrel"
 	"github.com/kms-qwe/auth/internal/model"
 	"github.com/kms-qwe/auth/internal/repository"
 	"github.com/kms-qwe/auth/internal/repository/postgres/user/converter"
 	modelRepo "github.com/kms-qwe/auth/internal/repository/postgres/user/model"
 	pgClient "github.com/kms-qwe/platform_common/pkg/client/postgres"
-)
-
-const (
-	tableName = "users"
-
-	idColumn        = "id"
-	nameColumn      = "name"
-	emailColumn     = "email"
-	passwordColumn  = "password"
-	roleColumn      = "role"
-	createdAtColumn = "created_at"
-	updatedAtColumn = "updated_at"
 )
 
 type repo struct {
@@ -31,15 +18,8 @@ type repo struct {
 
 // Create adds user to db
 func (r *repo) Create(ctx context.Context, info *model.UserInfo) (int64, error) {
-	repoInfo := converter.ToRepoFromUserInfo(info)
 
-	builder := sq.Insert(tableName).
-		PlaceholderFormat(sq.Dollar).
-		Columns(nameColumn, emailColumn, passwordColumn, roleColumn).
-		Values(repoInfo.Email, repoInfo.Email, repoInfo.Password, repoInfo.Role).
-		Suffix("RETURNING id")
-
-	query, args, err := builder.ToSql()
+	query, args, err := queryCreateUser(ctx, info)
 	if err != nil {
 		return 0, fmt.Errorf("failed to build query: %w", err)
 	}
@@ -60,12 +40,8 @@ func (r *repo) Create(ctx context.Context, info *model.UserInfo) (int64, error) 
 
 // Get select user from db
 func (r *repo) Get(ctx context.Context, id int64) (*model.User, error) {
-	builder := sq.Select(idColumn, nameColumn, emailColumn, passwordColumn, roleColumn, createdAtColumn, updatedAtColumn).
-		From(tableName).
-		PlaceholderFormat(sq.Dollar).
-		Where(sq.Eq{"id": id})
 
-	query, args, err := builder.ToSql()
+	query, args, err := queryGetUser(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build query: %w", err)
 	}
@@ -87,17 +63,8 @@ func (r *repo) Get(ctx context.Context, id int64) (*model.User, error) {
 
 // Update updates user info in db
 func (r *repo) Update(ctx context.Context, userInfoUpdate *model.UserInfoUpdate) error {
-	repoUserInfoUpdate := converter.ToRepoFromUserInfoUpdate(userInfoUpdate)
 
-	builder := sq.Update(tableName).
-		PlaceholderFormat(sq.Dollar).
-		Set(nameColumn, repoUserInfoUpdate.Name).
-		Set(emailColumn, repoUserInfoUpdate.Email).
-		Set(roleColumn, repoUserInfoUpdate.Role).
-		Set(updatedAtColumn, sq.Expr("NOW()")).
-		Where(sq.Eq{"id": repoUserInfoUpdate.ID})
-
-	query, args, err := builder.ToSql()
+	query, args, err := queryUpdateUser(ctx, userInfoUpdate)
 	if err != nil {
 		return fmt.Errorf("failed to build query: %w", err)
 	}
@@ -119,11 +86,8 @@ func (r *repo) Update(ctx context.Context, userInfoUpdate *model.UserInfoUpdate)
 
 // Delete deletes user from db
 func (r *repo) Delete(ctx context.Context, id int64) error {
-	builder := sq.Delete(tableName).
-		PlaceholderFormat(sq.Dollar).
-		Where(sq.Eq{"id": id})
 
-	query, args, err := builder.ToSql()
+	query, args, err := queryDeleteUser(ctx, id)
 	if err != nil {
 		return fmt.Errorf("failed to build query: %w", err)
 	}
