@@ -6,11 +6,11 @@ import (
 	"log"
 
 	sq "github.com/Masterminds/squirrel"
-	pgClient "github.com/kms-qwe/auth/internal/client/postgres"
 	"github.com/kms-qwe/auth/internal/model"
 	"github.com/kms-qwe/auth/internal/repository"
 	"github.com/kms-qwe/auth/internal/repository/postgres/user/converter"
 	modelRepo "github.com/kms-qwe/auth/internal/repository/postgres/user/model"
+	pgClient "github.com/kms-qwe/platform_common/pkg/client/postgres"
 )
 
 const (

@@ -8,8 +8,9 @@ import "google/protobuf/wrappers.proto";
 option go_package = "github.com/kms-qwe/auth/app/pkg/user_V1;user_v1";
 
 enum Role {
-    USER = 0;
-    ADMIN = 1;
+    UNKNOWN = 0;
+    USER = 1;
+    ADMIN = 2;
 }
 
 message UserInfo {

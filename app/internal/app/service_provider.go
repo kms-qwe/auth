@@ -5,10 +5,9 @@ import (
 	"log"
 
 	"github.com/kms-qwe/auth/internal/api/grpc/user"
-	"github.com/kms-qwe/auth/internal/client/postgres"
-	pgv1 "github.com/kms-qwe/auth/internal/client/postgres/pg_v1"
-	"github.com/kms-qwe/auth/internal/client/postgres/transaction"
-	"github.com/kms-qwe/auth/internal/closer"
+	"github.com/kms-qwe/platform_common/pkg/client/postgres"
+	pg "github.com/kms-qwe/platform_common/pkg/client/postgres/pg"
+
 	"github.com/kms-qwe/auth/internal/config"
 	"github.com/kms-qwe/auth/internal/config/env"
 	"github.com/kms-qwe/auth/internal/repository"
@@ -16,6 +15,8 @@ import (
 	usepg "github.com/kms-qwe/auth/internal/repository/postgres/user"
 	"github.com/kms-qwe/auth/internal/service"
 	useserv "github.com/kms-qwe/auth/internal/service/user"
+	"github.com/kms-qwe/platform_common/pkg/client/postgres/transaction"
+	"github.com/kms-qwe/platform_common/pkg/closer"
 )
 
 type serviceProvider struct {
@@ -29,7 +30,7 @@ type serviceProvider struct {
 
 	userService service.UserService
 
-	userImpl *user.Implementation
+	userImpl *user.GrpcHandlers
 }
 
 func newServiceProvider() *serviceProvider {
@@ -39,12 +40,11 @@ func (s *serviceProvider) PGConfig() config.PGConfig {
 	if s.pgConfig == nil {
 		cfg, err := env.NewPGConfig()
 		if err != nil {
-			log.Fatalf("failed to get postgres config: %s", err.Error())
+			log.Panicf("failed to get postgres config: %s", err.Error())
 		}
 
 		s.pgConfig = cfg
 	}
-
 	return s.pgConfig
 }
 
@@ -52,7 +52,7 @@ func (s *serviceProvider) GRPCConfig() config.GRPCConfig {
 	if s.grpcConfig == nil {
 		cfg, err := env.NewGRPCConfig()
 		if err != nil {
-			log.Fatalf("failed to get grpc config: %s", err.Error())
+			log.Panicf("failed to get grpc config: %s", err.Error())
 		}
 
 		s.grpcConfig = cfg
@@ -63,15 +63,15 @@ func (s *serviceProvider) GRPCConfig() config.GRPCConfig {
 
 func (s *serviceProvider) PGClient(ctx context.Context) postgres.Client {
 	if s.pgClient == nil {
-		pgClient, err := pgv1.NewPgClient(ctx, s.PGConfig().DSN())
+		pgClient, err := pg.NewPgClient(ctx, s.PGConfig().DSN())
 
 		if err != nil {
-			log.Fatalf("failed to create pg client: %v", err)
+			log.Panicf("failed to create pg client: %v", err)
 		}
 
 		err = pgClient.DB().Ping(ctx)
 		if err != nil {
-			log.Fatalf("ping error: %s", err.Error())
+			log.Panicf("ping error: %s", err.Error())
 		}
 		s.pgClient = pgClient
 
@@ -114,9 +114,9 @@ func (s *serviceProvider) UserService(ctx context.Context) service.UserService {
 	return s.userService
 }
 
-func (s *serviceProvider) UserImpl(ctx context.Context) *user.Implementation {
+func (s *serviceProvider) UserImpl(ctx context.Context) *user.GrpcHandlers {
 	if s.userImpl == nil {
-		s.userImpl = user.NewImplementation(s.UserService(ctx))
+		s.userImpl = user.NewUserGrpcHandlers(s.UserService(ctx))
 	}
 
 	return s.userImpl

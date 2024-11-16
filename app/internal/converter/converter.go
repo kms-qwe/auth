@@ -1,7 +1,7 @@
 package converter
 
 import (
-	"database/sql"
+	"time"
 
 	"github.com/kms-qwe/auth/internal/model"
 	desc "github.com/kms-qwe/auth/pkg/user_v1"
@@ -9,29 +9,29 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
-// ToUserFromDesc convert desc model to service model
-func ToUserFromDesc(user *desc.User) *model.User {
+// ToUserFromAPI convert desc model to service model
+func ToUserFromAPI(user *desc.User) *model.User {
 	return &model.User{
 		ID:        user.Id,
-		Info:      ToUserInfoFromDesc(user.Info),
+		Info:      ToUserInfoFromAPI(user.Info),
 		CreatedAt: user.CreatedAt.AsTime(),
-		UpdatedAt: TimestampToNullTime(user.UpdatedAt),
+		UpdatedAt: TimestampToPtrTime(user.UpdatedAt),
 	}
 }
 
-// ToDescFromUser convert service model to desc model
-func ToDescFromUser(user *model.User) *desc.User {
+// ToAPIFromUser convert service model to desc model
+func ToAPIFromUser(user *model.User) *desc.User {
 
 	return &desc.User{
 		Id:        user.ID,
-		Info:      ToDescFromUserInfo(user.Info),
+		Info:      ToAPIFromUserInfo(user.Info),
 		CreatedAt: timestamppb.New(user.CreatedAt),
-		UpdatedAt: ConvertNullTimeToTimestamp(user.UpdatedAt),
+		UpdatedAt: PtrTimeToTimestamp(user.UpdatedAt),
 	}
 }
 
-// ToUserInfoFromDesc convert desc model to service model
-func ToUserInfoFromDesc(userInfo *desc.UserInfo) *model.UserInfo {
+// ToUserInfoFromAPI convert desc model to service model
+func ToUserInfoFromAPI(userInfo *desc.UserInfo) *model.UserInfo {
 	return &model.UserInfo{
 		Name:     userInfo.Name,
 		Email:    userInfo.Email,
@@ -40,8 +40,8 @@ func ToUserInfoFromDesc(userInfo *desc.UserInfo) *model.UserInfo {
 	}
 }
 
-// ToDescFromUserInfo convert service model to desc model
-func ToDescFromUserInfo(userInfo *model.UserInfo) *desc.UserInfo {
+// ToAPIFromUserInfo convert service model to desc model
+func ToAPIFromUserInfo(userInfo *model.UserInfo) *desc.UserInfo {
 	return &desc.UserInfo{
 		Name:     userInfo.Name,
 		Email:    userInfo.Email,
@@ -50,56 +50,60 @@ func ToDescFromUserInfo(userInfo *model.UserInfo) *desc.UserInfo {
 	}
 }
 
-// ToUserInfoUpdateFromDesc convert desc model to service model
-func ToUserInfoUpdateFromDesc(userInfoUpdate *desc.UserInfoUpdate) *model.UserInfoUpdate {
+// ToUserInfoUpdateFromAPI convert desc model to service model
+func ToUserInfoUpdateFromAPI(userInfoUpdate *desc.UserInfoUpdate) *model.UserInfoUpdate {
 	return &model.UserInfoUpdate{
 		ID:    userInfoUpdate.Id,
-		Name:  StringValueToNullString(userInfoUpdate.Name),
-		Email: StringValueToNullString(userInfoUpdate.Email),
+		Name:  StringValueToPtrString(userInfoUpdate.Name),
+		Email: StringValueToPtrString(userInfoUpdate.Email),
 		Role:  int32(userInfoUpdate.Role),
 	}
 }
 
-// ToDescFromUserInfoUpdate convert service model to desc model
-func ToDescFromUserInfoUpdate(userInfoUpdate *model.UserInfoUpdate) *desc.UserInfoUpdate {
+// ToAPIFromUserInfoUpdate convert service model to desc model
+func ToAPIFromUserInfoUpdate(userInfoUpdate *model.UserInfoUpdate) *desc.UserInfoUpdate {
 	return &desc.UserInfoUpdate{
 		Id:    userInfoUpdate.ID,
-		Name:  NullStringToStringValue(userInfoUpdate.Name),
-		Email: NullStringToStringValue(userInfoUpdate.Email),
+		Name:  PtrStringToStringValue(userInfoUpdate.Name),
+		Email: PtrStringToStringValue(userInfoUpdate.Email),
 		Role:  desc.Role(userInfoUpdate.Role),
 	}
 }
 
-// TimestampToNullTime convert *timestamppb.Timestamp to sql.Nulltime
-func TimestampToNullTime(ts *timestamppb.Timestamp) sql.NullTime {
-	if ts == nil {
-		return sql.NullTime{Valid: false}
+// TimestampToPtrTime convert *timestamppb.Timestamp to *time.Time
+func TimestampToPtrTime(ts *timestamppb.Timestamp) *time.Time {
+	var t *time.Time
+	if ts != nil {
+		timeValue := ts.AsTime()
+		t = &timeValue
 	}
-	return sql.NullTime{Time: ts.AsTime(), Valid: true}
+	return t
 }
 
-// ConvertNullTimeToTimestamp convert sql.Nulltime to *timestamppb.Timestamp
-func ConvertNullTimeToTimestamp(nt sql.NullTime) *timestamppb.Timestamp {
+// PtrTimeToTimestamp convert *time.Time to *timestamppb.Timestamp
+func PtrTimeToTimestamp(t *time.Time) *timestamppb.Timestamp {
 	var ts *timestamppb.Timestamp
-	if nt.Valid {
-		ts = timestamppb.New(nt.Time)
+	if t != nil {
+		ts = timestamppb.New(*t)
 	}
 	return ts
 }
 
-// StringValueToNullString convert *wrapperspb.StringValue to sql.NullString
-func StringValueToNullString(sv *wrapperspb.StringValue) sql.NullString {
-	if sv == nil {
-		return sql.NullString{Valid: false}
+// StringValueToPtrString convert *wrapperspb.StringValue to *string
+func StringValueToPtrString(sv *wrapperspb.StringValue) *string {
+	var s *string
+	if sv != nil {
+		stringValue := sv.Value
+		s = &stringValue
 	}
-	return sql.NullString{String: sv.String(), Valid: true}
+	return s
 }
 
-// NullStringToStringValue convert sql.NullString to *wrapperspb.StringValue
-func NullStringToStringValue(ns sql.NullString) *wrapperspb.StringValue {
+// PtrStringToStringValue convert *string to *wrapperspb.StringValue
+func PtrStringToStringValue(s *string) *wrapperspb.StringValue {
 	var sv *wrapperspb.StringValue
-	if ns.Valid {
-		sv = wrapperspb.String(ns.String)
+	if s != nil {
+		sv = wrapperspb.String(*s)
 	}
 	return sv
 }
