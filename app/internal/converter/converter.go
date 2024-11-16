@@ -9,7 +9,7 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
-// ToUserFromAPI convert desc model to service model
+// ToUserFromAPI convert API model to service model
 func ToUserFromAPI(user *desc.User) *model.User {
 	return &model.User{
 		ID:        user.Id,
@@ -19,7 +19,7 @@ func ToUserFromAPI(user *desc.User) *model.User {
 	}
 }
 
-// ToAPIFromUser convert service model to desc model
+// ToAPIFromUser convert service model to API model
 func ToAPIFromUser(user *model.User) *desc.User {
 
 	return &desc.User{
@@ -30,7 +30,7 @@ func ToAPIFromUser(user *model.User) *desc.User {
 	}
 }
 
-// ToUserInfoFromAPI convert desc model to service model
+// ToUserInfoFromAPI convert API model to service model
 func ToUserInfoFromAPI(userInfo *desc.UserInfo) *model.UserInfo {
 	return &model.UserInfo{
 		Name:     userInfo.Name,
@@ -40,7 +40,7 @@ func ToUserInfoFromAPI(userInfo *desc.UserInfo) *model.UserInfo {
 	}
 }
 
-// ToAPIFromUserInfo convert service model to desc model
+// ToAPIFromUserInfo convert service model to API model
 func ToAPIFromUserInfo(userInfo *model.UserInfo) *desc.UserInfo {
 	return &desc.UserInfo{
 		Name:     userInfo.Name,
@@ -50,7 +50,7 @@ func ToAPIFromUserInfo(userInfo *model.UserInfo) *desc.UserInfo {
 	}
 }
 
-// ToUserInfoUpdateFromAPI convert desc model to service model
+// ToUserInfoUpdateFromAPI convert API model to service model
 func ToUserInfoUpdateFromAPI(userInfoUpdate *desc.UserInfoUpdate) *model.UserInfoUpdate {
 	return &model.UserInfoUpdate{
 		ID:    userInfoUpdate.Id,
@@ -60,7 +60,7 @@ func ToUserInfoUpdateFromAPI(userInfoUpdate *desc.UserInfoUpdate) *model.UserInf
 	}
 }
 
-// ToAPIFromUserInfoUpdate convert service model to desc model
+// ToAPIFromUserInfoUpdate convert service model to API model
 func ToAPIFromUserInfoUpdate(userInfoUpdate *model.UserInfoUpdate) *desc.UserInfoUpdate {
 	return &desc.UserInfoUpdate{
 		Id:    userInfoUpdate.ID,
