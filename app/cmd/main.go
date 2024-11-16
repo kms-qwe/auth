@@ -10,12 +10,12 @@ import (
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	chatApp, err := app.NewApp(ctx)
+	authApp, err := app.NewApp(ctx)
 	if err != nil {
 		log.Panicf("failed to init app: %s\n", err.Error())
 	}
 
-	err = chatApp.Run(ctx, cancel)
+	err = authApp.Run(ctx, cancel)
 	if err != nil {
 		log.Panicf("failed to run app: %s\n", err.Error())
 	}
