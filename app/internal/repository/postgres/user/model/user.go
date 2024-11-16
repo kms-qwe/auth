@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+// Role represents user role
+type Role int32
+
 // User модель для работы с postgres
 type User struct {
 	ID        int64        `db:"id"`         // Unique identifier for the user.
@@ -26,5 +29,5 @@ type UserInfoUpdate struct {
 	ID    int64          `db:"id"`
 	Name  sql.NullString `db:"name"`
 	Email sql.NullString `db:"email"`
-	Role  int32          `db:"role"`
+	Role  Role           `db:"role"`
 }

@@ -56,7 +56,7 @@ func ToUserInfoUpdateFromAPI(userInfoUpdate *desc.UserInfoUpdate) *model.UserInf
 		ID:    userInfoUpdate.Id,
 		Name:  StringValueToPtrString(userInfoUpdate.Name),
 		Email: StringValueToPtrString(userInfoUpdate.Email),
-		Role:  int32(userInfoUpdate.Role),
+		Role:  model.Role(userInfoUpdate.Role),
 	}
 }
 
