@@ -63,7 +63,7 @@ func ToUserInfoUpdateFromRepo(userInfoUpdate *modelRepo.UserInfoUpdate) *model.U
 		ID:    userInfoUpdate.ID,
 		Name:  name,
 		Email: email,
-		Role:  model.Role(userInfoUpdate.Role),
+		Role:  userInfoUpdate.Role,
 	}
 }
 
@@ -73,7 +73,7 @@ func ToRepoFromUserInfoUpdate(userInfoUpdate *model.UserInfoUpdate) *modelRepo.U
 		ID:    userInfoUpdate.ID,
 		Name:  PtrStringToNullString(userInfoUpdate.Name),
 		Email: PtrStringToNullString(userInfoUpdate.Email),
-		Role:  modelRepo.Role(userInfoUpdate.Role),
+		Role:  userInfoUpdate.Role,
 	}
 }
 

@@ -2,10 +2,9 @@ package model
 
 import (
 	"time"
-)
 
-// Role represents user role
-type Role int32
+	"github.com/kms-qwe/auth/internal/constant"
+)
 
 // User represents a user in the system with related information.
 // It includes an ID, user info, and timestamps for creation and updates.
@@ -29,5 +28,5 @@ type UserInfoUpdate struct {
 	ID    int64
 	Name  *string
 	Email *string
-	Role  Role
+	Role  constant.Role
 }

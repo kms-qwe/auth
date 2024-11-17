@@ -3,10 +3,9 @@ package model
 import (
 	"database/sql"
 	"time"
-)
 
-// Role represents user role
-type Role int32
+	"github.com/kms-qwe/auth/internal/constant"
+)
 
 // User модель для работы с postgres
 type User struct {
@@ -29,5 +28,5 @@ type UserInfoUpdate struct {
 	ID    int64          `db:"id"`
 	Name  sql.NullString `db:"name"`
 	Email sql.NullString `db:"email"`
-	Role  Role           `db:"role"`
+	Role  constant.Role  `db:"role"`
 }
