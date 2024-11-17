@@ -30,7 +30,7 @@ type serviceProvider struct {
 
 	userService service.UserService
 
-	userImpl *user.GrpcHandlers
+	userGrpcHandlers *user.GrpcHandlers
 }
 
 func newServiceProvider() *serviceProvider {
@@ -115,9 +115,9 @@ func (s *serviceProvider) UserService(ctx context.Context) service.UserService {
 }
 
 func (s *serviceProvider) UserImpl(ctx context.Context) *user.GrpcHandlers {
-	if s.userImpl == nil {
-		s.userImpl = user.NewUserGrpcHandlers(s.UserService(ctx))
+	if s.userGrpcHandlers == nil {
+		s.userGrpcHandlers = user.NewUserGrpcHandlers(s.UserService(ctx))
 	}
 
-	return s.userImpl
+	return s.userGrpcHandlers
 }
