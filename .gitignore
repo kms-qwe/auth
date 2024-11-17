@@ -1,4 +1,4 @@
 .idea
 /bin/
-.vscode/
+.vscode
 /coverage.out
