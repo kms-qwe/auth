@@ -3,6 +3,7 @@ package converter
 import (
 	"time"
 
+	"github.com/kms-qwe/auth/internal/constant"
 	"github.com/kms-qwe/auth/internal/model"
 	desc "github.com/kms-qwe/auth/pkg/user_v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -56,7 +57,7 @@ func ToUserInfoUpdateFromAPI(userInfoUpdate *desc.UserInfoUpdate) *model.UserInf
 		ID:    userInfoUpdate.Id,
 		Name:  StringValueToPtrString(userInfoUpdate.Name),
 		Email: StringValueToPtrString(userInfoUpdate.Email),
-		Role:  model.Role(userInfoUpdate.Role),
+		Role:  constant.Role(userInfoUpdate.Role),
 	}
 }
 
