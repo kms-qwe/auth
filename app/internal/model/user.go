@@ -4,6 +4,9 @@ import (
 	"time"
 )
 
+// Role represents user role
+type Role int32
+
 // User represents a user in the system with related information.
 // It includes an ID, user info, and timestamps for creation and updates.
 type User struct {
@@ -19,4 +22,12 @@ type UserInfo struct {
 	Email    string
 	Password string
 	Role     int32
+}
+
+// UserInfoUpdate holds information about a user update.
+type UserInfoUpdate struct {
+	ID    int64
+	Name  *string
+	Email *string
+	Role  Role
 }
