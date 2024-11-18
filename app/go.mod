@@ -6,8 +6,9 @@ require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/brianvoe/gofakeit/v6 v6.28.0
 	github.com/gojuno/minimock/v3 v3.4.2
+	github.com/gomodule/redigo v1.9.2
 	github.com/joho/godotenv v1.5.1
-	github.com/kms-qwe/platform_common v1.0.0
+	github.com/kms-qwe/platform_common v1.1.1
 	github.com/stretchr/testify v1.8.4
 	google.golang.org/grpc v1.67.1
 	google.golang.org/protobuf v1.35.1

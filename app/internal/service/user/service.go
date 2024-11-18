@@ -2,11 +2,14 @@ package user
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
+	"github.com/kms-qwe/auth/internal/cache"
 	"github.com/kms-qwe/auth/internal/model"
 	"github.com/kms-qwe/auth/internal/repository"
 	"github.com/kms-qwe/auth/internal/service"
+
 	pgClient "github.com/kms-qwe/platform_common/pkg/client/postgres"
 )
 
@@ -14,19 +17,23 @@ type serv struct {
 	userRepository repository.UserRepository
 	logRepository  repository.LogRepository
 	txManager      pgClient.TxManager
+
+	userCache cache.UserCache
 }
 
-// TODO: добавить редис
+// TODO: добавить редис в сервисный слой. изменить инициализацию сервисного слоя - прокинуть редис
 // NewUserService creates new a UserService with provided  UserRepository LogRepository TxManager
 func NewUserService(
 	userRepository repository.UserRepository,
 	logRepository repository.LogRepository,
 	txManager pgClient.TxManager,
+	userCache cache.UserCache,
 ) service.UserService {
 	return &serv{
 		userRepository: userRepository,
 		logRepository:  logRepository,
 		txManager:      txManager,
+		userCache:      userCache,
 	}
 }
 
@@ -77,13 +84,26 @@ func (s *serv) Delete(ctx context.Context, id int64) error {
 		return err
 	}
 
+	err = s.userCache.Delete(ctx, id)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 // Get gets a new user using the provided id
 func (s *serv) Get(ctx context.Context, id int64) (*model.User, error) {
-	var user = &model.User{}
-	err := s.txManager.ReadCommitted(ctx, func(ctx context.Context) error {
+
+	user, err := s.userCache.Get(ctx, id)
+	if err == nil {
+		return user, nil
+	}
+	if !errors.Is(err, model.ErrorUserNotFound) {
+		return nil, err
+	}
+	user = &model.User{}
+	err = s.txManager.ReadCommitted(ctx, func(ctx context.Context) error {
 		var errTx error
 		user, errTx = s.userRepository.Get(ctx, id)
 		if errTx != nil {
@@ -103,7 +123,14 @@ func (s *serv) Get(ctx context.Context, id int64) (*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	err = s.userCache.Set(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+
 	fmt.Printf("ITOG USER %#v\n", user)
+
 	return user, nil
 }
 

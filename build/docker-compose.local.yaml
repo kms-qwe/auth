@@ -1,7 +1,10 @@
 version: '3'
 
+# TODO: выяснить, почему volume не сохраняется при перезапуске
+
 volumes:
   postgres_volume:
+  redis-data:
 
 services:
   auth:
@@ -15,7 +18,8 @@ services:
     depends_on:
       migrator:
         condition: service_completed_successfully
-
+      redis:
+        condition: service_healthy
     ports:
       - ${GPRC_OUTER_PORT}:${GPRC_INNER_PORT}
     environment:
@@ -23,7 +27,19 @@ services:
 
   
 
-    
+  redis:
+    image: redis:7.2.5-alpine3.20
+    container_name: redis-container
+    ports:
+      - "${REDIS_OUTER_PORT}:${REDIS_INNER_PORT}"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
   pg:
     image: postgres:14-alpine3.17
     container_name: 
