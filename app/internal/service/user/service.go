@@ -16,6 +16,7 @@ type serv struct {
 	txManager      pgClient.TxManager
 }
 
+// TODO: добавить редис
 // NewUserService creates new a UserService with provided  UserRepository LogRepository TxManager
 func NewUserService(
 	userRepository repository.UserRepository,
