@@ -34,7 +34,7 @@ func TestUpdate(t *testing.T) {
 		id    = gofakeit.Int64()
 		name  = gofakeit.Name()
 		email = gofakeit.Email()
-		role  = desc.Role(gofakeit.Number(0, 10))
+		role  = desc.Role(gofakeit.Int32() % 3)
 
 		serviceErr = fmt.Errorf("service error")
 

@@ -19,6 +19,7 @@ type cacheWithTtl struct {
 	ttl time.Duration
 }
 
+// NewUserCache initializes a new redis user cache instance using the provided redis client and ttl.
 func NewUserCache(cl client.RedisCache, ttl time.Duration) cache.UserCache {
 	return &cacheWithTtl{
 		cl:  cl,
@@ -26,13 +27,15 @@ func NewUserCache(cl client.RedisCache, ttl time.Duration) cache.UserCache {
 	}
 }
 
-func IDToKey(id int64) string {
+func idToKey(id int64) string {
 	return strconv.FormatInt(id, 10)
 }
+
+// Set sets user to cache
 func (c *cacheWithTtl) Set(ctx context.Context, user *model.User) error {
 	cacheUser := converter.ToCacheFromUser(user)
 
-	key := IDToKey(cacheUser.ID)
+	key := idToKey(cacheUser.ID)
 	err := c.cl.HashSet(ctx, key, cacheUser)
 	if err != nil {
 		return err
@@ -46,8 +49,9 @@ func (c *cacheWithTtl) Set(ctx context.Context, user *model.User) error {
 	return nil
 }
 
+// Get gets user from cache
 func (c *cacheWithTtl) Get(ctx context.Context, id int64) (*model.User, error) {
-	key := IDToKey(id)
+	key := idToKey(id)
 
 	values, err := c.cl.HGetAll(ctx, key)
 	if err != nil {
@@ -67,8 +71,9 @@ func (c *cacheWithTtl) Get(ctx context.Context, id int64) (*model.User, error) {
 	return converter.ToUserFromCache(&user), nil
 }
 
+// Delete deletes user from cache
 func (c *cacheWithTtl) Delete(ctx context.Context, id int64) error {
-	key := IDToKey(id)
+	key := idToKey(id)
 
 	err := c.cl.Delete(ctx, key)
 	if err != nil {

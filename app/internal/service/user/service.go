@@ -21,7 +21,6 @@ type serv struct {
 	userCache cache.UserCache
 }
 
-// TODO: добавить редис в сервисный слой. изменить инициализацию сервисного слоя - прокинуть редис
 // NewUserService creates new a UserService with provided  UserRepository LogRepository TxManager
 func NewUserService(
 	userRepository repository.UserRepository,

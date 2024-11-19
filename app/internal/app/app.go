@@ -101,7 +101,7 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 
 	reflection.Register(a.grpcServer)
 
-	desc.RegisterUserV1Server(a.grpcServer, a.serviceProvider.UserImpl(ctx))
+	desc.RegisterUserV1Server(a.grpcServer, a.serviceProvider.UserGrpcHandlers(ctx))
 
 	return nil
 }

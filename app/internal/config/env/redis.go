@@ -32,6 +32,7 @@ type redisConfig struct {
 	ttl time.Duration
 }
 
+// NewRedisConfig creates a new redis configuration based on environment variables.
 func NewRedisConfig() (config.RedisConfig, error) {
 	host := os.Getenv(redisHostEnvName)
 	if len(host) == 0 {
@@ -94,22 +95,27 @@ func NewRedisConfig() (config.RedisConfig, error) {
 
 }
 
+// Address provides Redis address
 func (cfg *redisConfig) Address() string {
 	return net.JoinHostPort(cfg.host, cfg.port)
 }
 
+// ConnectionTimeout provides Redis connection timeout
 func (cfg *redisConfig) ConnectionTimeout() time.Duration {
 	return cfg.connectionTimeout
 }
 
+// MaxIdle provides Redis number of max idle
 func (cfg *redisConfig) MaxIdle() int {
 	return cfg.maxIdle
 }
 
+// IdleTimeout provides Redis idle timeout
 func (cfg *redisConfig) IdleTimeout() time.Duration {
 	return cfg.idleTimeout
 }
 
+// TTL provides Redis ttl
 func (cfg *redisConfig) TTL() time.Duration {
 	return cfg.ttl
 }

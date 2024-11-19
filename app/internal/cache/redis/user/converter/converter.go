@@ -7,6 +7,7 @@ import (
 	"github.com/kms-qwe/auth/internal/model"
 )
 
+// ToCacheFromUser convert serivce model to cache model
 func ToCacheFromUser(user *model.User) *modelCache.User {
 	return &modelCache.User{
 		ID:        user.ID,
@@ -19,6 +20,7 @@ func ToCacheFromUser(user *model.User) *modelCache.User {
 	}
 }
 
+// TimePtrToInt64Ptr converts time ptr to int64 ptr
 func TimePtrToInt64Ptr(t *time.Time) *int64 {
 	var num int64
 	if t != nil {
@@ -28,6 +30,7 @@ func TimePtrToInt64Ptr(t *time.Time) *int64 {
 	return &num
 }
 
+// Int64PtrToTimePtr converts int64 ptr to time ptr
 func Int64PtrToTimePtr(n *int64) *time.Time {
 	var t time.Time
 	if n != nil {
@@ -37,6 +40,7 @@ func Int64PtrToTimePtr(n *int64) *time.Time {
 	return &t
 }
 
+// ToUserFromCache convert cache model to service model
 func ToUserFromCache(user *modelCache.User) *model.User {
 	return &model.User{
 		ID: user.ID,

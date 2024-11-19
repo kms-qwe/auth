@@ -33,7 +33,7 @@ func TestCreate(t *testing.T) {
 		name     = gofakeit.Name()
 		email    = gofakeit.Email()
 		password = gofakeit.Password(true, true, true, true, false, 12)
-		role     = desc.Role(gofakeit.Number(0, 10))
+		role     = desc.Role(gofakeit.Int32() % 3)
 
 		serviceErr = fmt.Errorf("service error")
 

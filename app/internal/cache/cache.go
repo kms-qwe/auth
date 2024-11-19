@@ -6,6 +6,7 @@ import (
 	"github.com/kms-qwe/auth/internal/model"
 )
 
+// UserCache interface defines methods for user cache operations.
 type UserCache interface {
 	// Set adds user to cache
 	Set(ctx context.Context, user *model.User) error
