@@ -2,8 +2,8 @@ version: '3'
 
 
 volumes:
-  postgres_volume:
-  redis-data:
+  auth_postgres_volume:
+  auth_redis-data:
 
 services:
   auth:
@@ -15,9 +15,9 @@ services:
     container_name: 
       auth-container
     depends_on:
-      migrator:
+      auth-migrator:
         condition: service_completed_successfully
-      redis:
+      auth-redis:
         condition: service_healthy
     ports:
       - ${GPRC_OUTER_PORT}:${GPRC_INNER_PORT}
@@ -26,45 +26,45 @@ services:
 
   
 
-  redis:
+  auth-redis:
     image: redis:7.2.5-alpine3.20
-    container_name: redis-container
+    container_name: auth-redis-container
     ports:
       - "${REDIS_OUTER_PORT}:${REDIS_INNER_PORT}"
     volumes:
-      - redis-data:/data
+      - auth_redis-data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 3s
       retries: 3
 
-  pg:
+  auth-pg:
     image: postgres:14-alpine3.17
     container_name: 
-      pg-container
+      auth-pg-container
     env_file:
       - ".env"
     ports:
       - "${PG_OUTER_PORT}:${PG_INNER_PORT}"
     volumes:
-      - postgres_volume:/var/lib/postgresql/data
+      - auth_postgres_volume:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
       interval: 5s
       timeout: 5s
       retries: 5
   
-  migrator:
+  auth-migrator:
     build:
       context: ..
       dockerfile: ./build/migration.Dockerfile 
       args:
         MIGRATION_DIR: "./migration"
     container_name: 
-      migrator-container
+      auth-migrator-container
     depends_on:
-      pg:
+      auth-pg:
         condition: service_healthy
     env_file:
       - ".env"
