@@ -34,20 +34,22 @@ func ToAPIFromUser(user *model.User) *desc.User {
 // ToUserInfoFromAPI convert API model to service model
 func ToUserInfoFromAPI(userInfo *desc.UserInfo) *model.UserInfo {
 	return &model.UserInfo{
-		Name:     userInfo.Name,
-		Email:    userInfo.Email,
-		Password: userInfo.Password,
-		Role:     int32(userInfo.Role),
+		Name:            userInfo.Name,
+		Email:           userInfo.Email,
+		Password:        userInfo.Password,
+		PasswordConfirm: userInfo.PasswordConfirm,
+		Role:            constant.Role(userInfo.Role),
 	}
 }
 
 // ToAPIFromUserInfo convert service model to API model
 func ToAPIFromUserInfo(userInfo *model.UserInfo) *desc.UserInfo {
 	return &desc.UserInfo{
-		Name:     userInfo.Name,
-		Email:    userInfo.Email,
-		Password: userInfo.Password,
-		Role:     desc.Role(userInfo.Role),
+		Name:            userInfo.Name,
+		Email:           userInfo.Email,
+		Password:        userInfo.Password,
+		PasswordConfirm: userInfo.PasswordConfirm,
+		Role:            desc.Role(userInfo.Role),
 	}
 }
 

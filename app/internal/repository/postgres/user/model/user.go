@@ -17,10 +17,10 @@ type User struct {
 
 // UserInfo модель для работы с postres
 type UserInfo struct {
-	Name     string `db:"name"`
-	Email    string `db:"email"`
-	Password string `db:"password"`
-	Role     int32  `db:"role"`
+	Name     string        `db:"name"`
+	Email    string        `db:"email"`
+	Password string        `db:"password"`
+	Role     constant.Role `db:"role"`
 }
 
 // UserInfoUpdate holds information about a user.
