@@ -19,8 +19,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-//TODO: сделать тесты
-
 func TestCreate(t *testing.T) {
 	t.Parallel()
 	type userRepositoryMockFunc func(mc *minimock.Controller) repository.UserRepository
