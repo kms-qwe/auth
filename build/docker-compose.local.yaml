@@ -1,6 +1,5 @@
 version: '3'
 
-# TODO: выяснить, почему volume не сохраняется при перезапуске
 
 volumes:
   postgres_volume:
@@ -49,7 +48,7 @@ services:
     ports:
       - "${PG_OUTER_PORT}:${PG_INNER_PORT}"
     volumes:
-      - postgres_volume:/var/lib/portgresql/data
+      - postgres_volume:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
       interval: 5s
