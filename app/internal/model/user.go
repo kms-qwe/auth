@@ -17,10 +17,11 @@ type User struct {
 
 // UserInfo holds information about a user.
 type UserInfo struct {
-	Name     string
-	Email    string
-	Password string
-	Role     int32
+	Name            string
+	Email           string
+	Password        string
+	PasswordConfirm string
+	Role            constant.Role
 }
 
 // UserInfoUpdate holds information about a user update.
