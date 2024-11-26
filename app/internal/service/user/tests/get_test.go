@@ -43,11 +43,12 @@ func TestGet(t *testing.T) {
 		createdAt = gofakeit.Date()
 		updatedAt = gofakeit.Date()
 
-		userRepoErr  = fmt.Errorf("user repo error")
-		logRepoErr   = fmt.Errorf("log repo error")
-		txManagerErr = fmt.Errorf("tx manager error")
-		cacheGetErr  = fmt.Errorf("cache get error")
-		cacheSetErr  = fmt.Errorf("cache set error")
+		userRepoErr    = fmt.Errorf("user repo error")
+		logRepoErr     = fmt.Errorf("log repo error")
+		txManagerErr   = fmt.Errorf("tx manager error")
+		cacheGetErr    = fmt.Errorf("cache get error")
+		cacheSetErr    = fmt.Errorf("cache set error")
+		cacheExpireErr = fmt.Errorf("cache expire error")
 
 		reqCorrect = id
 
@@ -136,6 +137,8 @@ func TestGet(t *testing.T) {
 				mock := cacheMock.NewUserCacheMock(mc)
 				mock.GetMock.Expect(ctx, reqCorrect).Return(nil, model.ErrorUserNotFound)
 				mock.SetMock.Expect(ctx, resCorrect).Return(nil)
+				mock.ExpireMock.Expect(ctx, resCorrect.ID, 0).Return(nil)
+
 				return mock
 			},
 		},
@@ -311,6 +314,40 @@ func TestGet(t *testing.T) {
 				mock := cacheMock.NewUserCacheMock(mc)
 				mock.GetMock.Expect(ctx, reqCorrect).Return(nil, model.ErrorUserNotFound)
 				mock.SetMock.Expect(ctx, resCorrect).Return(cacheSetErr)
+				return mock
+			},
+		},
+		{
+			name: "t7: cache expire error case",
+			args: args{
+				ctx: ctx,
+				req: reqCorrect,
+			},
+			want: nil,
+			err:  cacheExpireErr,
+			userRepositoryMock: func(mc *minimock.Controller) repository.UserRepository {
+				mock := repositoryMock.NewUserRepositoryMock(mc)
+				mock.GetMock.Expect(ctx, reqCorrect).Return(resCorrect, nil)
+				return mock
+			},
+			logRepositoryMock: func(mc *minimock.Controller) repository.LogRepository {
+				mock := repositoryMock.NewLogRepositoryMock(mc)
+				mock.LogMock.Expect(ctx, logCorrect).Return(nil)
+				return mock
+			},
+			txManagerMock: func(mc *minimock.Controller) pgClient.TxManager {
+				mock := pgClientMock.NewTxManagerMock(mc)
+				mock.ReadCommittedMock.Set(func(ctx context.Context, f pgClient.Handler) error {
+					return f(ctx)
+				})
+				return mock
+			},
+			cacheMock: func(mc *minimock.Controller) cache.UserCache {
+				mock := cacheMock.NewUserCacheMock(mc)
+				mock.GetMock.Expect(ctx, reqCorrect).Return(nil, model.ErrorUserNotFound)
+				mock.SetMock.Expect(ctx, resCorrect).Return(nil)
+				mock.ExpireMock.Expect(ctx, resCorrect.ID, 0).Return(cacheExpireErr)
+
 				return mock
 			},
 		},

@@ -8,6 +8,7 @@ import (
 	"context"
 	"sync"
 	mm_atomic "sync/atomic"
+	"time"
 	mm_time "time"
 
 	"github.com/gojuno/minimock/v3"
@@ -24,6 +25,12 @@ type UserCacheMock struct {
 	afterDeleteCounter  uint64
 	beforeDeleteCounter uint64
 	DeleteMock          mUserCacheMockDelete
+
+	funcExpire          func(ctx context.Context, id int64, ttl time.Duration) (err error)
+	inspectFuncExpire   func(ctx context.Context, id int64, ttl time.Duration)
+	afterExpireCounter  uint64
+	beforeExpireCounter uint64
+	ExpireMock          mUserCacheMockExpire
 
 	funcGet          func(ctx context.Context, id int64) (up1 *model.User, err error)
 	inspectFuncGet   func(ctx context.Context, id int64)
@@ -48,6 +55,9 @@ func NewUserCacheMock(t minimock.Tester) *UserCacheMock {
 
 	m.DeleteMock = mUserCacheMockDelete{mock: m}
 	m.DeleteMock.callArgs = []*UserCacheMockDeleteParams{}
+
+	m.ExpireMock = mUserCacheMockExpire{mock: m}
+	m.ExpireMock.callArgs = []*UserCacheMockExpireParams{}
 
 	m.GetMock = mUserCacheMockGet{mock: m}
 	m.GetMock.callArgs = []*UserCacheMockGetParams{}
@@ -377,6 +387,354 @@ func (m *UserCacheMock) MinimockDeleteInspect() {
 	if !m.DeleteMock.invocationsDone() && afterDeleteCounter > 0 {
 		m.t.Errorf("Expected %d calls to UserCacheMock.Delete but found %d calls",
 			mm_atomic.LoadUint64(&m.DeleteMock.expectedInvocations), afterDeleteCounter)
+	}
+}
+
+type mUserCacheMockExpire struct {
+	optional           bool
+	mock               *UserCacheMock
+	defaultExpectation *UserCacheMockExpireExpectation
+	expectations       []*UserCacheMockExpireExpectation
+
+	callArgs []*UserCacheMockExpireParams
+	mutex    sync.RWMutex
+
+	expectedInvocations uint64
+}
+
+// UserCacheMockExpireExpectation specifies expectation struct of the UserCache.Expire
+type UserCacheMockExpireExpectation struct {
+	mock      *UserCacheMock
+	params    *UserCacheMockExpireParams
+	paramPtrs *UserCacheMockExpireParamPtrs
+	results   *UserCacheMockExpireResults
+	Counter   uint64
+}
+
+// UserCacheMockExpireParams contains parameters of the UserCache.Expire
+type UserCacheMockExpireParams struct {
+	ctx context.Context
+	id  int64
+	ttl time.Duration
+}
+
+// UserCacheMockExpireParamPtrs contains pointers to parameters of the UserCache.Expire
+type UserCacheMockExpireParamPtrs struct {
+	ctx *context.Context
+	id  *int64
+	ttl *time.Duration
+}
+
+// UserCacheMockExpireResults contains results of the UserCache.Expire
+type UserCacheMockExpireResults struct {
+	err error
+}
+
+// Marks this method to be optional. The default behavior of any method with Return() is '1 or more', meaning
+// the test will fail minimock's automatic final call check if the mocked method was not called at least once.
+// Optional() makes method check to work in '0 or more' mode.
+// It is NOT RECOMMENDED to use this option unless you really need it, as default behaviour helps to
+// catch the problems when the expected method call is totally skipped during test run.
+func (mmExpire *mUserCacheMockExpire) Optional() *mUserCacheMockExpire {
+	mmExpire.optional = true
+	return mmExpire
+}
+
+// Expect sets up expected params for UserCache.Expire
+func (mmExpire *mUserCacheMockExpire) Expect(ctx context.Context, id int64, ttl time.Duration) *mUserCacheMockExpire {
+	if mmExpire.mock.funcExpire != nil {
+		mmExpire.mock.t.Fatalf("UserCacheMock.Expire mock is already set by Set")
+	}
+
+	if mmExpire.defaultExpectation == nil {
+		mmExpire.defaultExpectation = &UserCacheMockExpireExpectation{}
+	}
+
+	if mmExpire.defaultExpectation.paramPtrs != nil {
+		mmExpire.mock.t.Fatalf("UserCacheMock.Expire mock is already set by ExpectParams functions")
+	}
+
+	mmExpire.defaultExpectation.params = &UserCacheMockExpireParams{ctx, id, ttl}
+	for _, e := range mmExpire.expectations {
+		if minimock.Equal(e.params, mmExpire.defaultExpectation.params) {
+			mmExpire.mock.t.Fatalf("Expectation set by When has same params: %#v", *mmExpire.defaultExpectation.params)
+		}
+	}
+
+	return mmExpire
+}
+
+// ExpectCtxParam1 sets up expected param ctx for UserCache.Expire
+func (mmExpire *mUserCacheMockExpire) ExpectCtxParam1(ctx context.Context) *mUserCacheMockExpire {
+	if mmExpire.mock.funcExpire != nil {
+		mmExpire.mock.t.Fatalf("UserCacheMock.Expire mock is already set by Set")
+	}
+
+	if mmExpire.defaultExpectation == nil {
+		mmExpire.defaultExpectation = &UserCacheMockExpireExpectation{}
+	}
+
+	if mmExpire.defaultExpectation.params != nil {
+		mmExpire.mock.t.Fatalf("UserCacheMock.Expire mock is already set by Expect")
+	}
+
+	if mmExpire.defaultExpectation.paramPtrs == nil {
+		mmExpire.defaultExpectation.paramPtrs = &UserCacheMockExpireParamPtrs{}
+	}
+	mmExpire.defaultExpectation.paramPtrs.ctx = &ctx
+
+	return mmExpire
+}
+
+// ExpectIdParam2 sets up expected param id for UserCache.Expire
+func (mmExpire *mUserCacheMockExpire) ExpectIdParam2(id int64) *mUserCacheMockExpire {
+	if mmExpire.mock.funcExpire != nil {
+		mmExpire.mock.t.Fatalf("UserCacheMock.Expire mock is already set by Set")
+	}
+
+	if mmExpire.defaultExpectation == nil {
+		mmExpire.defaultExpectation = &UserCacheMockExpireExpectation{}
+	}
+
+	if mmExpire.defaultExpectation.params != nil {
+		mmExpire.mock.t.Fatalf("UserCacheMock.Expire mock is already set by Expect")
+	}
+
+	if mmExpire.defaultExpectation.paramPtrs == nil {
+		mmExpire.defaultExpectation.paramPtrs = &UserCacheMockExpireParamPtrs{}
+	}
+	mmExpire.defaultExpectation.paramPtrs.id = &id
+
+	return mmExpire
+}
+
+// ExpectTtlParam3 sets up expected param ttl for UserCache.Expire
+func (mmExpire *mUserCacheMockExpire) ExpectTtlParam3(ttl time.Duration) *mUserCacheMockExpire {
+	if mmExpire.mock.funcExpire != nil {
+		mmExpire.mock.t.Fatalf("UserCacheMock.Expire mock is already set by Set")
+	}
+
+	if mmExpire.defaultExpectation == nil {
+		mmExpire.defaultExpectation = &UserCacheMockExpireExpectation{}
+	}
+
+	if mmExpire.defaultExpectation.params != nil {
+		mmExpire.mock.t.Fatalf("UserCacheMock.Expire mock is already set by Expect")
+	}
+
+	if mmExpire.defaultExpectation.paramPtrs == nil {
+		mmExpire.defaultExpectation.paramPtrs = &UserCacheMockExpireParamPtrs{}
+	}
+	mmExpire.defaultExpectation.paramPtrs.ttl = &ttl
+
+	return mmExpire
+}
+
+// Inspect accepts an inspector function that has same arguments as the UserCache.Expire
+func (mmExpire *mUserCacheMockExpire) Inspect(f func(ctx context.Context, id int64, ttl time.Duration)) *mUserCacheMockExpire {
+	if mmExpire.mock.inspectFuncExpire != nil {
+		mmExpire.mock.t.Fatalf("Inspect function is already set for UserCacheMock.Expire")
+	}
+
+	mmExpire.mock.inspectFuncExpire = f
+
+	return mmExpire
+}
+
+// Return sets up results that will be returned by UserCache.Expire
+func (mmExpire *mUserCacheMockExpire) Return(err error) *UserCacheMock {
+	if mmExpire.mock.funcExpire != nil {
+		mmExpire.mock.t.Fatalf("UserCacheMock.Expire mock is already set by Set")
+	}
+
+	if mmExpire.defaultExpectation == nil {
+		mmExpire.defaultExpectation = &UserCacheMockExpireExpectation{mock: mmExpire.mock}
+	}
+	mmExpire.defaultExpectation.results = &UserCacheMockExpireResults{err}
+	return mmExpire.mock
+}
+
+// Set uses given function f to mock the UserCache.Expire method
+func (mmExpire *mUserCacheMockExpire) Set(f func(ctx context.Context, id int64, ttl time.Duration) (err error)) *UserCacheMock {
+	if mmExpire.defaultExpectation != nil {
+		mmExpire.mock.t.Fatalf("Default expectation is already set for the UserCache.Expire method")
+	}
+
+	if len(mmExpire.expectations) > 0 {
+		mmExpire.mock.t.Fatalf("Some expectations are already set for the UserCache.Expire method")
+	}
+
+	mmExpire.mock.funcExpire = f
+	return mmExpire.mock
+}
+
+// When sets expectation for the UserCache.Expire which will trigger the result defined by the following
+// Then helper
+func (mmExpire *mUserCacheMockExpire) When(ctx context.Context, id int64, ttl time.Duration) *UserCacheMockExpireExpectation {
+	if mmExpire.mock.funcExpire != nil {
+		mmExpire.mock.t.Fatalf("UserCacheMock.Expire mock is already set by Set")
+	}
+
+	expectation := &UserCacheMockExpireExpectation{
+		mock:   mmExpire.mock,
+		params: &UserCacheMockExpireParams{ctx, id, ttl},
+	}
+	mmExpire.expectations = append(mmExpire.expectations, expectation)
+	return expectation
+}
+
+// Then sets up UserCache.Expire return parameters for the expectation previously defined by the When method
+func (e *UserCacheMockExpireExpectation) Then(err error) *UserCacheMock {
+	e.results = &UserCacheMockExpireResults{err}
+	return e.mock
+}
+
+// Times sets number of times UserCache.Expire should be invoked
+func (mmExpire *mUserCacheMockExpire) Times(n uint64) *mUserCacheMockExpire {
+	if n == 0 {
+		mmExpire.mock.t.Fatalf("Times of UserCacheMock.Expire mock can not be zero")
+	}
+	mm_atomic.StoreUint64(&mmExpire.expectedInvocations, n)
+	return mmExpire
+}
+
+func (mmExpire *mUserCacheMockExpire) invocationsDone() bool {
+	if len(mmExpire.expectations) == 0 && mmExpire.defaultExpectation == nil && mmExpire.mock.funcExpire == nil {
+		return true
+	}
+
+	totalInvocations := mm_atomic.LoadUint64(&mmExpire.mock.afterExpireCounter)
+	expectedInvocations := mm_atomic.LoadUint64(&mmExpire.expectedInvocations)
+
+	return totalInvocations > 0 && (expectedInvocations == 0 || expectedInvocations == totalInvocations)
+}
+
+// Expire implements cache.UserCache
+func (mmExpire *UserCacheMock) Expire(ctx context.Context, id int64, ttl time.Duration) (err error) {
+	mm_atomic.AddUint64(&mmExpire.beforeExpireCounter, 1)
+	defer mm_atomic.AddUint64(&mmExpire.afterExpireCounter, 1)
+
+	if mmExpire.inspectFuncExpire != nil {
+		mmExpire.inspectFuncExpire(ctx, id, ttl)
+	}
+
+	mm_params := UserCacheMockExpireParams{ctx, id, ttl}
+
+	// Record call args
+	mmExpire.ExpireMock.mutex.Lock()
+	mmExpire.ExpireMock.callArgs = append(mmExpire.ExpireMock.callArgs, &mm_params)
+	mmExpire.ExpireMock.mutex.Unlock()
+
+	for _, e := range mmExpire.ExpireMock.expectations {
+		if minimock.Equal(*e.params, mm_params) {
+			mm_atomic.AddUint64(&e.Counter, 1)
+			return e.results.err
+		}
+	}
+
+	if mmExpire.ExpireMock.defaultExpectation != nil {
+		mm_atomic.AddUint64(&mmExpire.ExpireMock.defaultExpectation.Counter, 1)
+		mm_want := mmExpire.ExpireMock.defaultExpectation.params
+		mm_want_ptrs := mmExpire.ExpireMock.defaultExpectation.paramPtrs
+
+		mm_got := UserCacheMockExpireParams{ctx, id, ttl}
+
+		if mm_want_ptrs != nil {
+
+			if mm_want_ptrs.ctx != nil && !minimock.Equal(*mm_want_ptrs.ctx, mm_got.ctx) {
+				mmExpire.t.Errorf("UserCacheMock.Expire got unexpected parameter ctx, want: %#v, got: %#v%s\n", *mm_want_ptrs.ctx, mm_got.ctx, minimock.Diff(*mm_want_ptrs.ctx, mm_got.ctx))
+			}
+
+			if mm_want_ptrs.id != nil && !minimock.Equal(*mm_want_ptrs.id, mm_got.id) {
+				mmExpire.t.Errorf("UserCacheMock.Expire got unexpected parameter id, want: %#v, got: %#v%s\n", *mm_want_ptrs.id, mm_got.id, minimock.Diff(*mm_want_ptrs.id, mm_got.id))
+			}
+
+			if mm_want_ptrs.ttl != nil && !minimock.Equal(*mm_want_ptrs.ttl, mm_got.ttl) {
+				mmExpire.t.Errorf("UserCacheMock.Expire got unexpected parameter ttl, want: %#v, got: %#v%s\n", *mm_want_ptrs.ttl, mm_got.ttl, minimock.Diff(*mm_want_ptrs.ttl, mm_got.ttl))
+			}
+
+		} else if mm_want != nil && !minimock.Equal(*mm_want, mm_got) {
+			mmExpire.t.Errorf("UserCacheMock.Expire got unexpected parameters, want: %#v, got: %#v%s\n", *mm_want, mm_got, minimock.Diff(*mm_want, mm_got))
+		}
+
+		mm_results := mmExpire.ExpireMock.defaultExpectation.results
+		if mm_results == nil {
+			mmExpire.t.Fatal("No results are set for the UserCacheMock.Expire")
+		}
+		return (*mm_results).err
+	}
+	if mmExpire.funcExpire != nil {
+		return mmExpire.funcExpire(ctx, id, ttl)
+	}
+	mmExpire.t.Fatalf("Unexpected call to UserCacheMock.Expire. %v %v %v", ctx, id, ttl)
+	return
+}
+
+// ExpireAfterCounter returns a count of finished UserCacheMock.Expire invocations
+func (mmExpire *UserCacheMock) ExpireAfterCounter() uint64 {
+	return mm_atomic.LoadUint64(&mmExpire.afterExpireCounter)
+}
+
+// ExpireBeforeCounter returns a count of UserCacheMock.Expire invocations
+func (mmExpire *UserCacheMock) ExpireBeforeCounter() uint64 {
+	return mm_atomic.LoadUint64(&mmExpire.beforeExpireCounter)
+}
+
+// Calls returns a list of arguments used in each call to UserCacheMock.Expire.
+// The list is in the same order as the calls were made (i.e. recent calls have a higher index)
+func (mmExpire *mUserCacheMockExpire) Calls() []*UserCacheMockExpireParams {
+	mmExpire.mutex.RLock()
+
+	argCopy := make([]*UserCacheMockExpireParams, len(mmExpire.callArgs))
+	copy(argCopy, mmExpire.callArgs)
+
+	mmExpire.mutex.RUnlock()
+
+	return argCopy
+}
+
+// MinimockExpireDone returns true if the count of the Expire invocations corresponds
+// the number of defined expectations
+func (m *UserCacheMock) MinimockExpireDone() bool {
+	if m.ExpireMock.optional {
+		// Optional methods provide '0 or more' call count restriction.
+		return true
+	}
+
+	for _, e := range m.ExpireMock.expectations {
+		if mm_atomic.LoadUint64(&e.Counter) < 1 {
+			return false
+		}
+	}
+
+	return m.ExpireMock.invocationsDone()
+}
+
+// MinimockExpireInspect logs each unmet expectation
+func (m *UserCacheMock) MinimockExpireInspect() {
+	for _, e := range m.ExpireMock.expectations {
+		if mm_atomic.LoadUint64(&e.Counter) < 1 {
+			m.t.Errorf("Expected call to UserCacheMock.Expire with params: %#v", *e.params)
+		}
+	}
+
+	afterExpireCounter := mm_atomic.LoadUint64(&m.afterExpireCounter)
+	// if default expectation was set then invocations count should be greater than zero
+	if m.ExpireMock.defaultExpectation != nil && afterExpireCounter < 1 {
+		if m.ExpireMock.defaultExpectation.params == nil {
+			m.t.Error("Expected call to UserCacheMock.Expire")
+		} else {
+			m.t.Errorf("Expected call to UserCacheMock.Expire with params: %#v", *m.ExpireMock.defaultExpectation.params)
+		}
+	}
+	// if func was set then invocations count should be greater than zero
+	if m.funcExpire != nil && afterExpireCounter < 1 {
+		m.t.Error("Expected call to UserCacheMock.Expire")
+	}
+
+	if !m.ExpireMock.invocationsDone() && afterExpireCounter > 0 {
+		m.t.Errorf("Expected %d calls to UserCacheMock.Expire but found %d calls",
+			mm_atomic.LoadUint64(&m.ExpireMock.expectedInvocations), afterExpireCounter)
 	}
 }
 
@@ -1027,6 +1385,8 @@ func (m *UserCacheMock) MinimockFinish() {
 		if !m.minimockDone() {
 			m.MinimockDeleteInspect()
 
+			m.MinimockExpireInspect()
+
 			m.MinimockGetInspect()
 
 			m.MinimockSetInspect()
@@ -1054,6 +1414,7 @@ func (m *UserCacheMock) minimockDone() bool {
 	done := true
 	return done &&
 		m.MinimockDeleteDone() &&
+		m.MinimockExpireDone() &&
 		m.MinimockGetDone() &&
 		m.MinimockSetDone()
 }

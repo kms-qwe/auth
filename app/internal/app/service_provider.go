@@ -164,7 +164,7 @@ func (s *serviceProvider) RedisClient() cacheClient.RedisCache {
 // UserCache provides UserCache
 func (s *serviceProvider) UserCache() cache.UserCache {
 	if s.userCache == nil {
-		s.userCache = userCache.NewUserCache(s.RedisClient(), s.RedisConfig().TTL())
+		s.userCache = userCache.NewUserCache(s.RedisClient(), s.RedisConfig())
 	}
 
 	return s.userCache

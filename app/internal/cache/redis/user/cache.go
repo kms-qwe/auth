@@ -8,22 +8,23 @@ import (
 	redigo "github.com/gomodule/redigo/redis"
 	"github.com/kms-qwe/auth/internal/cache"
 	"github.com/kms-qwe/auth/internal/cache/redis/user/converter"
+	"github.com/kms-qwe/auth/internal/config"
 
 	modelCache "github.com/kms-qwe/auth/internal/cache/redis/user/model"
 	"github.com/kms-qwe/auth/internal/model"
 	client "github.com/kms-qwe/platform_common/pkg/client/cache"
 )
 
-type cacheWithTtl struct {
+type ch struct {
 	cl  client.RedisCache
-	ttl time.Duration
+	cfg config.RedisConfig
 }
 
 // NewUserCache initializes a new redis user cache instance using the provided redis client and ttl.
-func NewUserCache(cl client.RedisCache, ttl time.Duration) cache.UserCache {
-	return &cacheWithTtl{
+func NewUserCache(cl client.RedisCache, cfg config.RedisConfig) cache.UserCache {
+	return &ch{
 		cl:  cl,
-		ttl: ttl,
+		cfg: cfg,
 	}
 }
 
@@ -31,8 +32,25 @@ func idToKey(id int64) string {
 	return strconv.FormatInt(id, 10)
 }
 
+// Expire sets key to expire, if ttl is zero ttl sets to default from config
+func (c *ch) Expire(ctx context.Context, id int64, ttl time.Duration) error {
+
+	if ttl == 0 {
+		ttl = c.cfg.TTL()
+	}
+
+	key := idToKey(id)
+
+	err := c.cl.Expire(ctx, key, ttl)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Set sets user to cache
-func (c *cacheWithTtl) Set(ctx context.Context, user *model.User) error {
+func (c *ch) Set(ctx context.Context, user *model.User) error {
 	cacheUser := converter.ToCacheFromUser(user)
 
 	key := idToKey(cacheUser.ID)
@@ -41,16 +59,11 @@ func (c *cacheWithTtl) Set(ctx context.Context, user *model.User) error {
 		return err
 	}
 
-	err = c.cl.Expire(ctx, key, c.ttl)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
 // Get gets user from cache
-func (c *cacheWithTtl) Get(ctx context.Context, id int64) (*model.User, error) {
+func (c *ch) Get(ctx context.Context, id int64) (*model.User, error) {
 	key := idToKey(id)
 
 	values, err := c.cl.HGetAll(ctx, key)
@@ -72,7 +85,7 @@ func (c *cacheWithTtl) Get(ctx context.Context, id int64) (*model.User, error) {
 }
 
 // Delete deletes user from cache
-func (c *cacheWithTtl) Delete(ctx context.Context, id int64) error {
+func (c *ch) Delete(ctx context.Context, id int64) error {
 	key := idToKey(id)
 
 	err := c.cl.Delete(ctx, key)

@@ -128,6 +128,11 @@ func (s *serv) Get(ctx context.Context, id int64) (*model.User, error) {
 		return nil, err
 	}
 
+	err = s.userCache.Expire(ctx, user.ID, 0)
+	if err != nil {
+		return nil, err
+	}
+
 	fmt.Printf("ITOG USER %#v\n", user)
 
 	return user, nil
